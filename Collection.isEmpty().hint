@@ -1,0 +1,30 @@
+<!description="Use Colleciton.isEmpty() or Map.isEmpty() instead of size() comparison.">
+
+
+// todo: netbeans knows some of this already, contribute the delta
+// https://github.com/apache/netbeans/pull/3164
+/*
+$c.size() == 0 :: $c instanceof java.util.Collection =>
+$c.isEmpty()
+;;
+
+$c.size() != 0 :: $c instanceof java.util.Collection =>
+!$c.isEmpty()
+;;
+*/
+$c.size() > 0 :: $c instanceof java.util.Collection =>
+!$c.isEmpty()
+;;
+
+/*
+$c.size() == 0 :: $c instanceof java.util.Map =>
+$c.isEmpty()
+;;
+
+$c.size() != 0 :: $c instanceof java.util.Map =>
+!$c.isEmpty()
+;;
+*/  
+$c.size() > 0 :: $c instanceof java.util.Map =>
+!$c.isEmpty()
+;;

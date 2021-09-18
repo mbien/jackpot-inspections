@@ -1,0 +1,231 @@
+
+<!description="Improve stream call chain.">
+
+// Stream.empty uses a constant internally + is more descriptive
+java.util.stream.Stream.of() =>
+java.util.stream.Stream.empty()
+;;
+
+// Arrays.asList().stream() -> Arrays.stream() or Stream.of()
+java.util.Arrays.asList($l, $rest$).stream() =>
+java.util.stream.Stream.of($l, $rest$)
+;;
+
+// Collections.singleton().stream() -> Stream.of()
+java.util.Collections.singleton($s).stream() =>
+java.util.stream.Stream.of($s)
+;;
+
+// Collections.emptyList().stream() -> Stream.empty()
+java.util.Collections.emptyList().stream() =>
+java.util.stream.Stream.empty()
+;;
+
+
+"String::lines stream can be used.":
+$str.split("\n") :: $str instanceof java.lang.String =>
+$str.lines().toArray(String[]::new)
+;;
+
+"String::lines stream can be used.":
+$str.split("\\R") :: $str instanceof java.lang.String =>
+$str.lines().toArray(String[]::new)
+;;
+
+
+// shorter and faster
+// https://bugs.openjdk.java.net/browse/JDK-8265237
+"String::join can be used.":
+java.util.stream.Stream.of($e, $rest$).collect(java.util.stream.Collectors.joining($d)) :: $d instanceof CharSequence =>
+String.join($d, $e, $rest$)
+;;
+
+"String::join can be used.":
+java.util.Arrays.stream($e).collect(java.util.stream.Collectors.joining($d)) :: $d instanceof CharSequence =>
+String.join($d, $e)
+;;
+
+"String::join can be used.":
+java.util.List.of($e, $rest$).stream().collect(java.util.stream.Collectors.joining($d)) :: $d instanceof CharSequence =>
+String.join($d, $e, $rest$)
+;;
+
+"String::join can be used.":
+$col.stream().collect(java.util.stream.Collectors.joining($d)) :: $col instanceof java.util.Collection && $d instanceof CharSequence =>
+String.join($d, $col)
+;;
+
+
+// todo: doesn't work
+// map primitve to object -> boxed()
+/*
+$stream.mapToObj($x -> $x) :: $stream instanceof java.util.stream.IntStream =>
+$stream.boxed()
+;;
+
+$stream.mapToObj($x -> $x) :: $stream instanceof java.util.stream.LongStream =>
+$stream.boxed()
+;;
+
+$stream.mapToObj($x -> $x) :: $stream instanceof java.util.stream.DoubleStream =>
+$stream.boxed()
+;;
+
+// use peak if possible
+$stream.map($x -> {
+    $body$;
+    return $x;
+}) :: $stream instanceof java.util.stream.Stream =>
+$stream.peek($x -> {
+    $body$;
+})
+;;
+*/
+
+// filter+findAny -> anyMatch
+$stream.filter($lambda).findAny().isPresent() :: $stream instanceof java.util.stream.Stream =>
+$stream.anyMatch($lambda)
+;;
+
+// !filter+findAny -> noneMatch
+!$stream.filter($lambda).findAny().isPresent() :: $stream instanceof java.util.stream.Stream =>
+ $stream.noneMatch($lambda)
+;;
+
+// !anyMatch -> noneMatch
+!$stream.anyMatch($lambda) :: $stream instanceof java.util.stream.Stream =>
+ $stream.noneMatch($lambda)
+;;
+
+// !noneMatch -> anyMatch
+!$stream.noneMatch($lambda) :: $stream instanceof java.util.stream.Stream =>
+ $stream.anyMatch($lambda)
+;;
+
+// stream.sorted(comparator).findFirst() -> Stream.min(comparator)
+$stream.sorted($comp).findFirst() :: $stream instanceof java.util.stream.Stream =>
+$stream.min($comp)
+;;
+
+// makes it worse
+//$stream.sorted().findFirst() :: $stream instanceof java.util.stream.Stream =>
+//$stream.min(java.util.Comparator.naturalOrder())
+//;;
+
+// min -> max + invert order
+$stream.min(java.util.Comparator.reverseOrder()) :: $stream instanceof java.util.stream.Stream =>
+$stream.max(java.util.Comparator.naturalOrder())
+;;
+
+// max -> min + invert order
+$stream.max(java.util.Comparator.reverseOrder()) :: $stream instanceof java.util.stream.Stream =>
+$stream.min(java.util.Comparator.naturalOrder())
+;;
+
+
+// collection.stream().forEach() -> collection.forEach()
+"redundant stream() before forEach().":
+$col.stream().forEach($con) :: $col instanceof java.util.Collection && $con instanceof java.util.function.Consumer =>
+$col.forEach($con)
+;;
+
+// use copy constructors
+// collection.stream().collect(toList/toSet) -> new CollectionType<>(collection)
+$col.stream().collect(java.util.stream.Collectors.toList()) :: $col instanceof java.util.Collection =>
+new java.util.ArrayList<>($col)
+;;
+
+$col.stream().toList() :: $col instanceof java.util.Collection =>
+new java.util.ArrayList<>($col)
+;;
+
+$col.stream().collect(java.util.stream.Collectors.toSet()) :: $col instanceof java.util.Collection =>
+new java.util.HashSet<>($col)
+;;
+
+// collection.stream().toArray() -> collection.toArray()
+$col.stream().toArray($gen$) :: $col instanceof java.util.Collection =>
+$col.toArray($gen$)
+;;
+
+
+// Collections know best how to determine their element count
+$col.stream().count() :: $col instanceof java.util.Collection =>
+$col.size()
+;;
+
+// same here for collections
+$stream.flatMap(java.util.Collection::stream).count() :: $stream instanceof java.util.stream.Stream =>
+$stream.mapToLong(java.util.Collection::size).sum()
+;;
+
+// and map
+$stream.map(java.util.Map::values).flatMap(java.util.Collection::stream).count() :: $stream instanceof java.util.stream.Stream =>
+$stream.mapToLong(java.util.Map::size).sum()
+;;
+
+$stream.map(java.util.Map::values).mapToLong(java.util.Collection::size) :: $stream instanceof java.util.stream.Stream =>
+$stream.mapToLong(java.util.Map::size)
+;;
+
+// unnessesary collection step
+$stream.toList().size() :: $stream instanceof java.util.stream.Stream =>
+$stream.count()
+;;
+
+// simplify collectors
+// toList() shortcut 16+
+$stream.collect(java.util.stream.Collectors.toList()) :: $stream instanceof java.util.stream.Stream =>
+$stream.toList() //:: sourceVersionGE(SourceVersion.RELEASE_16)
+;;
+
+// stream.collect(counting()) -> stream.count()
+$stream.collect(java.util.stream.Collectors.counting()) :: $stream instanceof java.util.stream.Stream =>
+$stream.count()
+;;
+
+// stream.collect(maxBy()) -> stream.max()
+$stream.collect(java.util.stream.Collectors.maxBy($comp)) :: $stream instanceof java.util.stream.Stream && $comp instanceof java.util.Comparator =>
+$stream.max($comp)
+;;
+
+// stream.collect(minBy()) -> stream.min()
+$stream.collect(java.util.stream.Collectors.minBy($comp)) :: $stream instanceof java.util.stream.Stream && $comp instanceof java.util.Comparator =>
+$stream.min($comp)
+;;
+
+// stream.collect(mapping()) -> stream.map().collect()
+$stream.collect(java.util.stream.Collectors.mapping($f, $col)) :: $stream instanceof java.util.stream.Stream && $f instanceof java.util.function.Function && $col instanceof java.util.stream.Collector =>
+$stream.map($f).collect($col)
+;;
+
+// stream.collect(reducing()) -> stream.reduce()
+$stream.collect(java.util.stream.Collectors.reducing($params$)) :: $stream instanceof java.util.stream.Stream =>
+$stream.reduce($params$)
+;;
+
+// stream.collect(summingInt()) -> stream.mapToInt().sum()
+$stream.collect(java.util.stream.Collectors.summingInt($f)) :: $stream instanceof java.util.stream.Stream && $f instanceof java.util.function.ToIntFunction =>
+$stream.mapToInt($f).sum()
+;;
+
+$stream.collect(java.util.stream.Collectors.summingLong($f)) :: $stream instanceof java.util.stream.Stream && $f instanceof java.util.function.ToLongFunction =>
+$stream.mapToLong($f).sum()
+;;
+
+$stream.collect(java.util.stream.Collectors.summingDouble($f)) :: $stream instanceof java.util.stream.Stream && $f instanceof java.util.function.ToDoubleFunction =>
+$stream.mapToDouble($f).sum()
+;;
+
+// same for summarizing stats
+$stream.collect(java.util.stream.Collectors.summarizingInt($f)) :: $stream instanceof java.util.stream.Stream && $f instanceof java.util.function.ToIntFunction =>
+$stream.mapToInt($f).summaryStatistics()
+;;
+
+$stream.collect(java.util.stream.Collectors.summarizingLong($f)) :: $stream instanceof java.util.stream.Stream && $f instanceof java.util.function.ToLongFunction =>
+$stream.mapToLong($f).summaryStatistics()
+;;
+
+$stream.collect(java.util.stream.Collectors.summarizingDouble($f)) :: $stream instanceof java.util.stream.Stream && $f instanceof java.util.function.ToDoubleFunction =>
+$stream.mapToDouble($f).summaryStatistics()
+;;

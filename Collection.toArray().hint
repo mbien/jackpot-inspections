@@ -1,0 +1,32 @@
+// performance: https://shipilev.net/blog/2016/arrays-wisdom-ancients/#_conclusion
+
+<!description="Use Colleciton.toArray(new Obj[0]) instead of Colleciton.toArray(new Obj[size]).">
+
+/*
+Benchmark          (size)  Mode  Cnt     Score   Error  Units
+ToArrayJMH.toNew        8  avgt    5    23.899 ± 0.426  ns/op
+ToArrayJMH.toNew       64  avgt    5    70.554 ± 0.787  ns/op
+ToArrayJMH.toNew     1024  avgt    5   863.436 ± 9.239  ns/op
+ToArrayJMH.toSize       8  avgt    5    27.440 ± 0.290  ns/op
+ToArrayJMH.toSize      64  avgt    5   114.091 ± 0.794  ns/op
+ToArrayJMH.toSize    1024  avgt    5  1574.972 ± 7.812  ns/op
+ToArrayJMH.toZero       8  avgt    5    23.498 ± 0.263  ns/op
+ToArrayJMH.toZero      64  avgt    5    70.641 ± 0.662  ns/op
+ToArrayJMH.toZero    1024  avgt    5   860.637 ± 4.714  ns/op
+*/
+
+// https://github.com/apache/netbeans/pull/3166
+
+"Array conversion can be optimized by allowing the JVM to create the array.":
+$c.toArray(new $t[$c.size()]) :: $c instanceof java.util.Collection
+=>
+$c.toArray($t[]::new) //:: sourceVersionGE(SourceVersion.RELEASE_11)
+=>
+$c.toArray(new $t[0])
+;;
+
+// 11+ best practise
+$c.toArray(new $t[0]) :: $c instanceof java.util.Collection //:: sourceVersionGE(SourceVersion.RELEASE_11)
+=>
+$c.toArray($t[]::new) //:: sourceVersionGE(SourceVersion.RELEASE_11)
+;;

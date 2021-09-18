@@ -1,0 +1,58 @@
+<?
+import javax.lang.model.element.ElementKind;
+?>
+
+// declarations
+$modifiers$ java.util.Random $rng; =>
+$modifiers$ java.util.random.RandomGenerator $rng;
+;;
+
+$modifiers$ java.util.Random $rng = $initializer; =>
+$modifiers$ java.util.random.RandomGenerator $rng = $initializer;
+;;
+
+// assignments
+// should be '$rng super java.util.random.RandomGenerator'
+$rng = new java.util.Random($seed$) :: !$rng instanceof java.util.Random
+=> $rng = java.util.random.RandomGeneratorFactory.of("Random").create($seed$)
+=> $rng = java.util.random.RandomGeneratorFactory.getDefault().create($seed$)
+=> $rng = RandomGenerator.getDefault()
+;;
+
+// this is redundant but required because the above hack does not catch
+// RandomGenerator old2 = new Random() for some reason
+java.util.random.RandomGenerator $rng = new java.util.Random($seed$)
+=> java.util.random.RandomGenerator $rng = java.util.random.RandomGeneratorFactory.of("Random").create($seed$)
+=> java.util.random.RandomGenerator $rng = java.util.random.RandomGeneratorFactory.getDefault().create($seed$)
+=> java.util.random.RandomGenerator $rng = RandomGenerator.getDefault()
+;;
+
+
+// passed as value to methods or constructors
+new java.util.Random($seed$) :: isPassedToMethod()
+=> java.util.random.RandomGeneratorFactory.of("Random").create($seed$)
+=> java.util.random.RandomGeneratorFactory.getDefault().create($seed$)
+=> RandomGenerator.getDefault()
+;;
+
+<?
+public boolean isPassedToMethod() throws Throwable {
+
+    Variable parent = context.parent(context.variableForName("$_"));
+    if (parent == null) {
+        return false;
+    }
+
+    ElementKind kind = context.elementKind(parent);
+    return kind == ElementKind.METHOD || kind == ElementKind.CONSTRUCTOR;
+}
+?>
+
+
+/*
+new java.util.Random($seed$)
+=>java.util.random.RandomGeneratorFactory.of("Random").create($seed$)
+=>java.util.random.RandomGeneratorFactory.getDefault().create($seed$)
+=>RandomGenerator.getDefault()
+;;
+*/

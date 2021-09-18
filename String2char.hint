@@ -1,0 +1,82 @@
+<?
+import java.lang.reflect.Method;
+import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
+?>
+
+<!description="Converts single character Strings to char for improved performance.">
+
+/*
+sb.append(String s) is intrinisfied which gives it the same performance as the char version.
+(at least for the single character case)
+
+Benchmark                          Mode  Cnt  Score   Error  Units
+CharVsStringJMH.appendChar         avgt    5  4.493 ± 0.052  ns/op
+CharVsStringJMH.appendString       avgt    5  4.282 ± 0.028  ns/op
+CharVsStringJMH.indexOfChar        avgt    5  4.112 ± 0.015  ns/op
+CharVsStringJMH.indexOfString      avgt    5  5.333 ± 0.187  ns/op
+CharVsStringJMH.lastIndexOfChar    avgt    5  1.979 ± 0.007  ns/op
+CharVsStringJMH.lastIndexOfString  avgt    5  2.802 ± 0.038  ns/op
+CharVsStringJMH.replaceChar        avgt    5  6.932 ± 0.020  ns/op
+CharVsStringJMH.replaceString      avgt    5  6.948 ± 0.045  ns/op
+*/
+
+/*
+"Single character String can be converted into a char.":
+$sb.append($s) :: $sb instanceof StringBuilder && $s instanceof String && isSingleCharacter($s) =>
+$sb.append($c) :: string2Char($s, $c)
+;;
+*/
+
+// already in NB
+/*
+"Single character String can be converted into a char.":
+$str.indexOf($s) :: $str instanceof String && $s instanceof String && isSingleCharacter($s) =>
+$str.indexOf($c) :: string2Char($s, $c)
+;;
+
+"Single character String can be converted into a char.":
+$str.indexOf($s, $i) :: $str instanceof String && $s instanceof String && $i instanceof int && isSingleCharacter($s) =>
+$str.indexOf($c, $i) :: string2Char($s, $c)
+;;
+
+"Single character String can be converted into a char.":
+$str.lastIndexOf($s) :: $str instanceof String && $s instanceof String && isSingleCharacter($s) =>
+$str.lastIndexOf($c) :: string2Char($s, $c)
+;;
+
+"Single character String can be converted into a char.":
+$str.lastIndexOf($s, $i) :: $str instanceof String && $s instanceof String && $i instanceof int && isSingleCharacter($s) =>
+$str.lastIndexOf($c, $i) :: string2Char($s, $c)
+;;
+*/
+
+/*
+"Single character String can be converted into a char.":
+$str.replace($s, $s2) :: $str instanceof String && $s instanceof String && $s2 instanceof String && isSingleCharacter($s) && isSingleCharacter($s2) =>
+$str.replace($c, $c2) :: string2Char($s, $c) && string2Char($s2, $c2)
+;;
+*/
+
+<?
+public boolean string2Char(Variable str, Variable target) throws Throwable {
+    String value = getStringLiteral(str);
+    context.createRenamed(str, target, "'"+ value +"'");
+    return true;
+}
+public boolean isSingleCharacter(Variable str) throws Throwable {
+    String value = getStringLiteral(str);
+    return value != null && value.length() == 1;
+}
+private String getStringLiteral(Variable str) throws Throwable {
+    
+    Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
+    m.setAccessible(true);
+    TreePath tp = (TreePath) m.invoke(context, str);
+    if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
+        return (String) ((LiteralTree) tp.getLeaf()).getValue();
+    }
+    return null;
+}
+?>

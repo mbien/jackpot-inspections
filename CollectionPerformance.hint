@@ -1,0 +1,147 @@
+
+<!description="Replace obsolete Collections.">
+
+// replace old collections
+java.util.Stack =>
+java.util.ArrayDeque;;
+
+java.util.Vector =>
+java.util.ArrayList;;
+/*
+java.util.LinkedList =>
+java.util.ArrayList;;
+*/
+java.util.Hashtable =>
+java.util.HashMap;;
+
+/*
+$modifiers$ java.util.Stack<$g> $name = new java.util.Stack<$g$>(); =>
+$modifiers$ java.util.ArrayDeque<$g> $name = new java.util.ArrayDeque<$g$>();
+;;
+
+$modifiers$ java.util.Stack<$g> $name = $initializer; =>
+$modifiers$ java.util.ArrayDeque<$g> $name = $initializer;
+;;
+
+$modifiers$ java.util.Stack<$g> $name; =>
+$modifiers$ java.util.ArrayDeque<$g> $name;
+;;
+
+new java.util.Stack<$g$>() =>
+new java.util.ArrayDeque<$g$>()
+;;
+*/
+
+
+// avoid raw type warnings
+java.util.Collections.EMPTY_LIST =>
+java.util.Collections.emptyList();;
+
+java.util.Collections.EMPTY_SET =>
+java.util.Collections.emptySet();;
+
+java.util.Collections.EMPTY_MAP =>
+java.util.Collections.emptyMap();;
+
+// more descriptive
+java.util.Arrays.asList() =>
+java.util.Collections.emptyList();;
+
+// prefer immutable collection
+//java.util.Arrays.asList($a$) =>
+//java.util.List.of($a$);;
+
+
+// prefer list.sort()
+// less readable
+//java.util.Collections.sort($list) :: $list instanceof java.util.List =>
+//$list.sort(null);;
+
+java.util.Collections.sort($list, $comp) :: $list instanceof java.util.List =>
+$list.sort($comp);;
+
+// collections have faster bulk add opperations than the sequential loop of Collections.addAll()
+java.util.Collections.addAll($col, $array$) :: $col instanceof java.util.Collection =>
+$col.addAll(java.util.Arrays.asList($array$));;
+
+
+// prefer copy constructor over addAll()
+$more$ $col = new $Col();
+$col.addAll($other); =>
+$more$ $col = new $Col($other);
+;;
+
+$more$ $map = new $Map();
+$map.putAll($other); =>
+$more$ $map = new $Map($other);
+;;
+
+// avoid inefficient map traversal
+for ($K $k : $map.keySet()) {
+    $V $v = $map.get($k);
+    $body$;
+} :: $map instanceof java.util.Map
+=>
+for ($V $v : $map.values()) {
+    $body$;
+=>
+for (Map.Entry<$K, $V> entry : $map.entrySet()) {
+    $K $k = entry.getKey();
+    $V $v = entry.getValue();
+    $body$;
+;;
+
+// contains + get in succession
+if ($map.containsKey($key)) {
+    $V $v = $map.get($key);
+    $body$;
+} :: $map instanceof java.util.Map
+=>
+$V $v = $map.get($key);
+if ($v != null) {
+    $body$;
+}
+;;
+
+// todo: figure out how to get val type
+if ($map.containsKey($key)) {
+    return $map.get($key);
+} :: $map instanceof java.util.Map
+=>
+Object val = $map.get($key);
+if (val != null) {
+    return val;
+}
+;;
+
+// contains + remove in succession
+if ($col.contains($v)) {
+    $col.remove($v);
+} :: $col instanceof java.util.Collection
+=>
+$col.remove($v);
+;;
+
+if ($map.containsKey($k)) {
+    $map.remove($k);
+} :: $map instanceof java.util.Map
+=>
+$map.remove($k);
+;;
+
+// contains + put
+if (!$map.containsKey($k)) {
+    $map.put($k, $v);
+} :: $map instanceof java.util.Map
+=>
+$map.putIfAbsent($k, $v);
+;;
+
+
+// concise map population
+for ($O $o : $col) {
+    $map.put($key, $value);
+} :: $col instanceof java.util.Collection && $map instanceof java.util.Map
+=>
+$col.forEach($o -> $map.put($key, $value));
+;;

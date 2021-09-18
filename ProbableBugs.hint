@@ -1,0 +1,76 @@
+<?
+import java.lang.reflect.Method;
+import javax.lang.model.element.ElementKind;
+import com.sun.source.tree.LiteralTree;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
+?>
+
+// likely bug if used as statement
+"probable bug: Use Objects.requireNonNull() for null checks.":
+java.util.Objects.nonNull($obj); :: $obj instanceof Object =>
+java.util.Objects.requireNonNull($obj);
+;;
+
+// always true
+"probable bug: always true":
+$c.size() >= 0 :: $c instanceof java.util.Collection;;
+
+"probable bug: always true":
+$c.size() >= 0 :: $c instanceof java.util.Map;;
+
+"probable bug: always true":
+$s.length() >= 0 :: $s instanceof String;;
+
+// String.replaceAll() used without a regexp
+// replace can be 10-20x faster even in simple substitutions
+"This does not seem to be a regexp pattern, consider String.replace() instead.":
+$str.replaceAll($s0, $s1) :: $str instanceof String && $s0 instanceof String && $s1 instanceof String && !isRegexp($s0) =>
+$str.replace($s0, $s1)
+;;
+
+// functional streams which use native resources
+"Streams returned from Files.lines() must be closed. Statement should be in a try-with-resource block.":
+java.nio.file.Files.lines($1$) :: !isInTryWithResourceBlock();;
+
+"Streams returned from Files.list() must be closed. Statement should be in a try-with-resource block.":
+java.nio.file.Files.list($1$) :: !isInTryWithResourceBlock();;
+
+"Streams returned from Files.walk() must be closed. Statement should be in a try-with-resource block.":
+java.nio.file.Files.walk($1$) :: !isInTryWithResourceBlock();;
+
+
+<?
+public boolean isInTryWithResourceBlock() throws Throwable {
+    Variable parent = context.parent(context.variableForName("$_"));
+    if (parent == null) {
+        return false;
+    }
+    return context.elementKind(parent) == ElementKind.RESOURCE_VARIABLE;
+}
+
+// is not required to be fully accurate
+public boolean isRegexp(Variable str) throws Throwable {
+    String value = getStringLiteral(str);
+    if(value == null) {
+        return true; // we don't know, lets assume it is one
+    }
+    for (int i = 0; i < value.length(); i++) {
+        char c = value.charAt(i);
+        if (c == '\\' || c == '+' || c == '*' || c == '^' || c == '$' || c == '?' || c == '|') {
+            return true;
+        }
+    }
+    return false;
+}
+
+private String getStringLiteral(Variable str) throws Throwable {
+    Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
+    m.setAccessible(true);
+    TreePath tp = (TreePath) m.invoke(context, str);
+    if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
+        return (String) ((LiteralTree) tp.getLeaf()).getValue();
+    }
+    return null;
+}
+?>

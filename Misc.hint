@@ -1,0 +1,72 @@
+
+
+// faster and shorter
+$enum.class.getEnumConstants() :: $enum instanceof Enum =>
+$enum.values()
+;;
+
+"Unessesary null check before instanceof.":
+$a != null && $a instanceof $A =>
+$a instanceof $A
+;;
+
+// shorter null check
+if ($o == null) {
+    throw new NullPointerException($msg$);
+}
+=>
+java.util.Objects.requireNonNull($o, $msg$);
+;;
+
+// TODO: doesn't work, jackpot ignores the body. Looks like a bug.
+/*
+if ($o != null) {
+$body$;
+} else {
+    throw new NullPointerException($msg$);
+}
+=>
+java.util.Objects.requireNonNull($o, $msg$);
+$body$;
+;;
+*/
+
+/* TODO: doesn't work unless there is a way to create constants
+"extract Pattern constant.":
+$str.matches($regex) :: $str instanceof java.lang.String && $regex instanceof java.lang.String =>
+final java.util.regex.Pattern pattern = java.util.regex.Pattern.compile($regex);
+pattern.matcher($str).matches()
+;;
+*/
+
+// shorter toString()
+$o != null ? $o.toString() : $default =>
+java.util.Objects.toString($o, $default)
+;;
+$o == null ? $default : $o.toString() =>
+java.util.Objects.toString($o, $default)
+;;
+
+System.getProperty("line.separator") =>
+System.lineSeparator()
+;;
+
+System.getProperty("file.separator") =>
+java.io.File.separator
+;;
+
+System.getProperty("path.separator") =>
+java.io.File.pathSeparator
+;;
+
+// 9+
+System.getProperty("java.runtime.version") =>
+Runtime.version().toString()
+;;
+
+// 10+
+System.getProperty("java.specification.version") =>
+Runtime.version().feature()
+;;
+
+

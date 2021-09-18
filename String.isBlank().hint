@@ -1,0 +1,28 @@
+
+<!description="Use String#isBlank() where applicable.">
+
+// String.isBlank() 11+
+$str.trim().isEmpty() :: $str instanceof java.lang.String =>
+$str.isBlank()
+;;
+
+$str.trim().equals("") :: $str instanceof java.lang.String =>
+$str.isBlank()
+;;
+
+"".equals($str.trim()) :: $str instanceof java.lang.String =>
+$str.isBlank()
+;;
+
+$str.trim().length() == 0 :: $str instanceof java.lang.String =>
+$str.isBlank()
+;;
+
+$str.trim().length() != 0 :: $str instanceof java.lang.String =>
+!$str.isBlank()
+;;
+
+$str.trim().length() > 0 :: $str instanceof java.lang.String =>
+!$str.isBlank()
+;;
+

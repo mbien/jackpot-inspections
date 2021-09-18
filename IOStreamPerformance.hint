@@ -1,0 +1,32 @@
+
+<!description="Use ByteArrayOutputStream.toString() instead of new String(bos.toByteArray()).">
+
+
+"Rewrite to ByteArrayOutputStream.toByteArray().":
+new java.lang.String($bos.toByteArray(), $rest$) :: $bos instanceof java.io.ByteArrayOutputStream => 
+$bos.toString($rest$)
+;;
+
+
+// unnecessary buffering, https://github.com/openjdk/jdk/pull/3341
+"ByteArrayInputStream does not need to be buffered.":
+$mods$ $type$ $stream = new java.io.BufferedInputStream($in); :: $in instanceof java.io.ByteArrayInputStream =>
+$mods$ java.io.InputStream $stream = $in
+;;
+
+"ByteArrayOutputStream does not need to be buffered.":
+$mods$ $type$ $stream = new java.io.BufferedOutputStream($out); :: $out instanceof java.io.ByteArrayOutputStream =>
+$mods$ java.io.OutputStream $stream = $out
+;;
+
+
+// use Files.newInputStream due to https://bugs.openjdk.java.net/browse/JDK-8080225 (fixed in 10)
+"Files.newInputStream() can be used.":
+$mods$ $type$ $is = new java.io.FileInputStream($f); :: $f instanceof java.io.File =>
+$mods$ java.io.InputStream $is = java.nio.file.Files.newInputStream($f.toPath())
+;;
+
+"Files.newInputStream() can be used.":
+$mods$ $type$ $is = new java.io.FileInputStream($s); :: $s instanceof java.lang.String =>
+$mods$ java.io.InputStream $is = java.nio.file.Files.newInputStream(java.nio.file.Path.of($s))
+;;

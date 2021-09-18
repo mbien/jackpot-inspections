@@ -1,0 +1,127 @@
+<?
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
+
+import java.lang.reflect.Method;
+import com.sun.source.tree.*;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.source.util.TreePath;
+import com.sun.tools.javac.tree.*;
+?>
+
+
+<!description="Use StandardCharsets.UTF_8 constant instead of 'UTF-8' String lookup.">
+
+// todo: import StandardCharsets somehow to unblock this
+/*
+java.net.URLEncoder.encode($s, $charset_str) :: $charset_str instanceof java.lang.String =>
+java.net.URLEncoder.encode($s, $charset) :: string2Charset($str, $charset);;
+*/
+
+// URLEncoder and URLDecoder
+java.net.URLEncoder.encode($s, "UTF-8") :: $str instanceof java.lang.String =>
+java.net.URLEncoder.encode($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+java.net.URLDecoder.decode($s, "UTF-8") :: $s instanceof java.lang.String =>
+java.net.URLDecoder.decode($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+// Strings
+$s.getBytes("UTF-8") :: $s instanceof java.lang.String =>
+$s.getBytes(java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.lang.String($b, "UTF-8") :: $b instanceof byte[] => 
+new java.lang.String($b, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.lang.String($b, $o, $l, "UTF-8") :: $b instanceof byte[] && $o instanceof int && $l instanceof int => 
+new java.lang.String($b, $o, $l, java.nio.charset.StandardCharsets.UTF_8);;
+
+// IO Streams
+new java.io.InputStreamReader($s, "UTF-8") :: $s instanceof java.io.InputStream =>
+new java.io.InputStreamReader($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.io.OutputStreamWriter($s, "UTF-8") :: $s instanceof java.io.OutputStream =>
+new java.io.OutputStreamWriter($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.io.PrintStream($s, "UTF-8") :: $s instanceof java.lang.String =>
+new java.io.PrintStream($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.io.PrintStream($f, "UTF-8") :: $f instanceof java.io.File =>
+new java.io.PrintStream($f, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.io.PrintStream($o, $b, "UTF-8") :: $o instanceof java.io.OutputStream && $b instanceof boolean =>
+new java.io.PrintStream($o, $b, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.io.PrintWriter($s, "UTF-8") :: $s instanceof java.lang.String =>
+new java.io.PrintWriter($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.io.PrintWriter($f, "UTF-8") :: $f instanceof java.io.File =>
+new java.io.PrintWriter($f, java.nio.charset.StandardCharsets.UTF_8);;
+
+$bos.toString("UTF-8") :: $bos instanceof java.io.ByteArrayOutputStream =>
+$bos.toString(java.nio.charset.StandardCharsets.UTF_8));;
+
+// Channels
+java.nio.channels.Channels.newReader($ch, "UTF-8") :: $ch instanceof java.nio.channels.ReadableByteChannel =>
+java.nio.channels.Channels.newReader($ch, java.nio.charset.StandardCharsets.UTF_8);;
+
+java.nio.channels.Channels.newWriter($ch, "UTF-8") :: $ch instanceof java.nio.channels.WritableByteChannel =>
+java.nio.channels.Channels.newWriter($ch, java.nio.charset.StandardCharsets.UTF_8);;
+
+// Formatters
+new java.util.Formatter($s, "UTF-8") :: $s instanceof java.io.File =>
+new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.util.Formatter($s, "UTF-8", $l) :: $s instanceof java.io.File && $l instanceof java.util.Locale =>
+new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8, $l);;
+
+new java.util.Formatter($s, "UTF-8") :: $s instanceof java.io.OutputStream =>
+new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.util.Formatter($s, "UTF-8", $l) :: $s instanceof java.io.OutputStream && $l instanceof java.util.Locale =>
+new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8, $l);;
+    
+new java.util.Formatter($s, "UTF-8") :: $s instanceof java.lang.String =>
+new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.util.Formatter($s, "UTF-8", $l) :: $s instanceof java.lang.String && $l instanceof java.util.Locale =>
+new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8, $l);;
+
+// Scanner
+new java.util.Scanner($s, "UTF-8") :: $s instanceof java.io.File =>
+new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
+    
+new java.util.Scanner($s, "UTF-8") :: $s instanceof java.nio.file.Path =>
+new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.util.Scanner($s, "UTF-8") :: $s instanceof java.io.InputStream =>
+new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+new java.util.Scanner($s, "UTF-8") :: $s instanceof java.nio.channels.ReadableByteChannel =>
+new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
+
+// Properties
+$p.storeToXML($os, $c, "UTF-8") :: $p instanceof java.util.Properties && $os instanceof java.io.OutputStream && $c instanceof java.lang.String =>
+$p.storeToXML($os, $c, java.nio.charset.StandardCharsets.UTF_8);;
+
+
+
+<?
+public boolean string2Charset(Variable str, Variable target) throws Throwable {
+    
+    String string = getStringLiteral(str);
+    String value = "java.nio.charset.StandardCharsets." + string.replace('-', '_');
+
+    context.createRenamed(str, target, value);
+    return true;
+}
+private String getStringLiteral(Variable str) throws Throwable {
+    
+    Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
+    m.setAccessible(true);
+    TreePath tp = (TreePath) m.invoke(context, str);
+    if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
+        return (String) ((LiteralTree) tp.getLeaf()).getValue();
+    }
+    return null;
+}
+?>
