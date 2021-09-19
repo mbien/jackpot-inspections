@@ -23,7 +23,7 @@ $c.size() >= 0 :: $c instanceof java.util.Map;;
 $s.length() >= 0 :: $s instanceof String;;
 
 // String.replaceAll() used without a regexp
-// replace can be 10-20x faster even in simple substitutions
+// replace can be 10-20x faster even with simple substitutions
 "This does not seem to be a regexp pattern, consider String.replace() instead.":
 $str.replaceAll($s0, $s1) :: $str instanceof String && $s0 instanceof String && $s1 instanceof String && !isRegexp($s0) =>
 $str.replace($s0, $s1)

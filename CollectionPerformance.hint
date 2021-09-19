@@ -84,11 +84,15 @@ for ($K $k : $map.keySet()) {
 =>
 for ($V $v : $map.values()) {
     $body$;
+}
+:: !referencedIn($k, $body$)
 =>
 for (Map.Entry<$K, $V> entry : $map.entrySet()) {
     $K $k = entry.getKey();
     $V $v = entry.getValue();
     $body$;
+}
+:: otherwise
 ;;
 
 // contains + get in succession

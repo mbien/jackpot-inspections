@@ -21,7 +21,7 @@ java.util.Collections.emptyList().stream() =>
 java.util.stream.Stream.empty()
 ;;
 
-
+// 11
 "String::lines stream can be used.":
 $str.split("\n") :: $str instanceof java.lang.String =>
 $str.lines().toArray(String[]::new)
@@ -59,20 +59,20 @@ String.join($d, $col)
 // todo: doesn't work
 // map primitve to object -> boxed()
 /*
-$stream.mapToObj($x -> $x) :: $stream instanceof java.util.stream.IntStream =>
+$stream.mapToObj(($x) -> $x) :: $stream instanceof java.util.stream.IntStream =>
 $stream.boxed()
 ;;
 
-$stream.mapToObj($x -> $x) :: $stream instanceof java.util.stream.LongStream =>
+$stream.mapToObj(($x) -> $x) :: $stream instanceof java.util.stream.LongStream =>
 $stream.boxed()
 ;;
 
-$stream.mapToObj($x -> $x) :: $stream instanceof java.util.stream.DoubleStream =>
+$stream.mapToObj(($x) -> $x) :: $stream instanceof java.util.stream.DoubleStream =>
 $stream.boxed()
 ;;
 
-// use peak if possible
-$stream.map($x -> {
+// use peek if possible
+$stream.map(($x) -> {
     $body$;
     return $x;
 }) :: $stream instanceof java.util.stream.Stream =>

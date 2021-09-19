@@ -69,4 +69,7 @@ System.getProperty("java.specification.version") =>
 Runtime.version().feature()
 ;;
 
+System.getProperty("java.version") =>
+Runtime.version().feature()
+;;
 
