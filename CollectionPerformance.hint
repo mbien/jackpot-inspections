@@ -51,6 +51,12 @@ java.util.Collections.emptyList();;
 //java.util.Arrays.asList($a$) =>
 //java.util.List.of($a$);;
 
+// 9+
+java.util.Collections.unmodifiableList(java.util.Arrays.asList($a$)) =>
+java.util.List.of($a$);;
+
+java.util.Collections.unmodifiableSet(new java.util.HashSet<>(java.util.Arrays.asList($a$))) =>
+java.util.Set.of($a$);;
 
 // prefer list.sort()
 // less readable

@@ -179,6 +179,10 @@ $stream.collect(java.util.stream.Collectors.toList()) :: $stream instanceof java
 $stream.toList() //:: sourceVersionGE(SourceVersion.RELEASE_16)
 ;;
 
+$stream.collect(java.util.stream.Collectors.toUnmodifiableList()) :: $stream instanceof java.util.stream.Stream =>
+$stream.toList()//:: sourceVersionGE(SourceVersion.RELEASE_16)
+;;
+
 // stream.collect(counting()) -> stream.count()
 $stream.collect(java.util.stream.Collectors.counting()) :: $stream instanceof java.util.stream.Stream =>
 $stream.count()
