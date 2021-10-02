@@ -24,7 +24,7 @@ $props.put($key, $value) :: $props instanceof java.util.Properties =>
 $props.setProperty($key, $value)
 ;;
 
-$props.get($key) :: $props instanceof java.util.Properties =>
+(String) $props.get($key) :: $props instanceof java.util.Properties =>
 $props.getProperty($key)
 ;;
 
