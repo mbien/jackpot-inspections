@@ -30,3 +30,35 @@ $mods$ java.io.InputStream $is = java.nio.file.Files.newInputStream($f.toPath())
 $mods$ $type$ $is = new java.io.FileInputStream($s); :: $s instanceof java.lang.String =>
 $mods$ java.io.InputStream $is = java.nio.file.Files.newInputStream(java.nio.file.Path.of($s))
 ;;
+
+"Files.newOutputStream() can be used.":
+$mods$ $type$ $os = new java.io.FileOutputStream($f); :: $f instanceof java.io.File =>
+$mods$ java.io.OutputStream $is = java.nio.file.Files.newOutputStream($f.toPath())
+;;
+
+"Files.newOutputStream() can be used.":
+$mods$ $type$ $os = new java.io.FileOutputStream($s); :: $s instanceof java.lang.String =>
+$mods$ java.io.OutputStream $os = java.nio.file.Files.newOutputStream(java.nio.file.Path.of($s))
+;;
+
+// shorter
+"Files.newBufferedReader() can be used.":
+new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream($f))) :: $f instanceof java.io.File =>
+java.nio.file.Files.newBufferedReader($f.toPath())
+;;
+
+"Files.newBufferedReader() can be used.":
+new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream($s))) :: $s instanceof String =>
+java.nio.file.Files.newBufferedReader(java.nio.file.Path.of($s))
+;;
+
+"Files.newBufferedWriter() can be used.":
+new java.io.BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream($f))) :: $f instanceof java.io.File =>
+java.nio.file.Files.newBufferedWriter($f.toPath())
+;;
+
+"Files.newBufferedWriter() can be used.":
+new java.io.BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream($s))) :: $s instanceof String =>
+java.nio.file.Files.newBufferedWriter(java.nio.file.Path.of($s))
+;;
+
