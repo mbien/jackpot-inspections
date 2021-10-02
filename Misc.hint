@@ -18,6 +18,23 @@ if ($o == null) {
 java.util.Objects.requireNonNull($o, $msg$);
 ;;
 
+// 10+
+// does what it says
+$o.get() :: $o instanceof java.util.Optional =>
+$o.orElseThrow()
+;;
+
+// 11+
+!$o.isPresent() :: $o instanceof java.util.Optional =>
+$o.isEmpty())
+;;
+
+// 11+
+// similar performance, strip is unicode aware, trim is not.
+$str.trim() :: $str instanceof java.lang.String =>
+$str.strip()
+;;
+
 // TODO: doesn't work, jackpot ignores the body. Looks like a bug.
 /*
 if ($o != null) {
@@ -73,3 +90,27 @@ System.getProperty("java.version") =>
 Runtime.version().feature()
 ;;
 
+/* todo: should be a hint but no warning
+
+"use Long::hashCode for better hash code distribution.":
+$anno$ public int hashCode() {
+    return (int) $id;
+} :: $id instanceof long && elementKindMatches($id, ElementKind.FIELD)
+=>
+$anno$ public int hashCode() {
+    return Long.hashCode($id);
+}
+;;
+*/
+
+// code style
+/*
+for (int $i = $s; $i < $n; ++$i) {
+    $body$;
+}
+=>
+for (int $i = $s; $i < $n; $i++) {
+    $body$;
+}
+;;
+*/
