@@ -47,9 +47,15 @@ java.util.Collections.emptyMap();;
 java.util.Arrays.asList() =>
 java.util.Collections.emptyList();;
 
-// prefer immutable collection
-//java.util.Arrays.asList($a$) =>
-//java.util.List.of($a$);;
+// prefer immutable collection for small arrays
+// not recommended for large arrays in inner loops due to the null check
+// todo: add check for $a not being an array + remove $b
+java.util.Arrays.asList($a, $b, $more$) =>
+java.util.List.of($a, $b, $more$);;
+
+// shorter
+java.util.Collections.singletonList($a) =>
+java.util.List.of($a);;
 
 // 9+
 java.util.Collections.unmodifiableList(java.util.Arrays.asList($a$)) =>
@@ -93,7 +99,7 @@ for ($V $v : $map.values()) {
 }
 :: !referencedIn($k, $body$)
 =>
-for (Map.Entry<$K, $V> entry : $map.entrySet()) {
+for (java.util.Map.Entry<$K, $V> entry : $map.entrySet()) {
     $K $k = entry.getKey();
     $V $v = entry.getValue();
     $body$;

@@ -58,7 +58,7 @@ new java.io.PrintWriter($f, "UTF-8") :: $f instanceof java.io.File =>
 new java.io.PrintWriter($f, java.nio.charset.StandardCharsets.UTF_8);;
 
 $bos.toString("UTF-8") :: $bos instanceof java.io.ByteArrayOutputStream =>
-$bos.toString(java.nio.charset.StandardCharsets.UTF_8));;
+$bos.toString(java.nio.charset.StandardCharsets.UTF_8);;
 
 // Channels
 java.nio.channels.Channels.newReader($ch, "UTF-8") :: $ch instanceof java.nio.channels.ReadableByteChannel =>
