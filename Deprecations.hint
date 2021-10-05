@@ -50,6 +50,15 @@ Runtime.version().security() =>
 Runtime.version().update()
 ;;
 
+// semi-deprecated since 11
+java.nio.file.Paths.get($first, $more$) :: $first instanceof String =>
+java.nio.file.Path.of($first, $more$)
+;;
+
+java.nio.file.Paths.get($uri) :: $uri instanceof java.net.URI =>
+java.nio.file.Path.of($uri)
+;;
+
 // TODO: import RoundingMode somehow
 
 // BigDecimal method deprecations in 9 -> RoundingMode enum
