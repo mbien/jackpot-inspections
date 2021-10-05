@@ -1,28 +1,44 @@
 
 <!description="Use String#isBlank() where applicable.">
 
+// todo: add strip() rules
+
 // String.isBlank() 11+
-$str.trim().isEmpty() :: $str instanceof java.lang.String =>
+$str.trim().isEmpty() :: $str instanceof String =>
 $str.isBlank()
 ;;
 
-$str.trim().equals("") :: $str instanceof java.lang.String =>
+$str.trim().equals("") :: $str instanceof String =>
 $str.isBlank()
 ;;
 
-"".equals($str.trim()) :: $str instanceof java.lang.String =>
+"".equals($str.trim()) :: $str instanceof String =>
 $str.isBlank()
 ;;
 
-$str.trim().length() == 0 :: $str instanceof java.lang.String =>
+$str.trim().length() == 0 :: $str instanceof String =>
 $str.isBlank()
 ;;
 
-$str.trim().length() != 0 :: $str instanceof java.lang.String =>
+$str.trim().length() != 0 :: $str instanceof String =>
 !$str.isBlank()
 ;;
 
-$str.trim().length() > 0 :: $str instanceof java.lang.String =>
+$str.trim().length() > 0 :: $str instanceof String =>
 !$str.isBlank()
 ;;
 
+// str.equals("") -> isEmpty() is already in NetBeans
+// but those are not:
+// String.isEmpty() 6+
+$str.length() == 0 :: $str instanceof String =>
+$str.isEmpty()
+;;
+
+$str.length() != 0 :: $str instanceof String =>
+!$str.isEmpty()
+;;
+
+$str.length() > 0 :: $str instanceof String =>
+!$str.isEmpty()
+;;
