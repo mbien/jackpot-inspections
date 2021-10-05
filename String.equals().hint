@@ -1,3 +1,11 @@
+
+<?
+import javax.lang.model.element.ElementKind;
+import java.lang.reflect.Method;
+import com.sun.source.util.TreePath;
+import com.sun.source.tree.Tree.Kind;
+?>
+
 <!description="Use String#equals() where applicable.">
 
 // compareTo could be equals
@@ -16,7 +24,7 @@ $str1.equalsIgnoreCase($str2)
 $str1.toLowerCase().equals($str2) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str2, "$str.toLowerCase()") =>
 $str1.equalsIgnoreCase($str2)
 ;;
-$str1.equals($str2.toLowerCase()) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str1, "$str4toLowerCase()") =>
+$str1.equals($str2.toLowerCase()) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str1, "$str.toLowerCase()") =>
 $str1.equalsIgnoreCase($str2)
 ;;
 
@@ -29,3 +37,22 @@ $str1.equalsIgnoreCase($str2)
 $str1.equals($str2.toUpperCase()) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str1, "$str.toUpperCase()") =>
 $str1.equalsIgnoreCase($str2)
 ;;
+
+// null safe "foo".equals(foo)
+$str1 != null && $str1.equals($str2) :: $str1 instanceof String && $str2 instanceof String && isStringLiteral($str2) =>
+$str2.equals($str1)
+
+<?
+private boolean isStringLiteral(Variable str) throws Throwable {
+    if (ElementKind.FIELD.equals(context.elementKind(str))) { // todo
+        return true;
+    }
+    Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
+    m.setAccessible(true);
+    TreePath tp = (TreePath) m.invoke(context, str);
+    if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
+        return true;
+    }
+    return false;
+}
+?>
