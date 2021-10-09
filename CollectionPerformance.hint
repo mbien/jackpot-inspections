@@ -57,6 +57,12 @@ java.util.List.of($a, $b, $more$);;
 java.util.Collections.singletonList($a) =>
 java.util.List.of($a);;
 
+java.util.Collections.singleton($a) =>
+java.util.Set.of($a);;
+
+java.util.Collections.singletonMap($k, $v) =>
+java.util.Map.of($k, $v);;
+
 // 9+
 java.util.Collections.unmodifiableList(java.util.Arrays.asList($a$)) =>
 java.util.List.of($a$);;
@@ -160,4 +166,40 @@ for ($O $o : $col) {
 } :: $col instanceof java.util.Collection && $map instanceof java.util.Map
 =>
 $col.forEach($o -> $map.put($key, $value));
+;;
+
+
+// removeIf() 8+
+java.util.Iterator<$T> $it = $col.iterator();
+while ($it.hasNext()) {
+    $T $t = $it.next();
+    if ($condition) {
+        $it.remove();
+    }
+} :: $col instanceof java.util.Collection
+=>
+$col.removeIf($t -> $condition);
+;;
+
+// this one gonna be tricky
+/*
+java.util.Iterator<$T> $it = $col.iterator();
+while ($it.hasNext()) {
+    if ($it.next().$foo() {
+        $it.remove();
+    }
+} :: $col instanceof java.util.Collection
+=>
+$col.removeIf($T::$foo)
+;;
+*/
+
+for (java.util.Iterator<$T> $it = $col.iterator(); $it.hasNext(); ) {
+    $T $t = $it.next();
+    if ($condition) {
+        $it.remove();
+    }
+} :: $col instanceof java.util.Collection
+=>
+$col.removeIf($t -> $condition);
 ;;
