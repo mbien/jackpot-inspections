@@ -41,6 +41,7 @@ $str1.equalsIgnoreCase($str2)
 // null safe "foo".equals(foo)
 $str1 != null && $str1.equals($str2) :: $str1 instanceof String && $str2 instanceof String && isStringLiteral($str2) =>
 $str2.equals($str1)
+;;
 
 <?
 private boolean isStringLiteral(Variable str) throws Throwable {
