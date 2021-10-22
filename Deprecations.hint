@@ -8,7 +8,7 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.*;
 ?>
 
-// 9
+// deprecated in 9 (but rule is valid since 8)
 $class.newInstance() :: $class instanceof Class =>
 $class.getDeclaredConstructor().newInstance()
 ;;
@@ -38,30 +38,30 @@ $f.setVisible(false);
 ;;
 
 // deprecated in 10
-Runtime.version().major() =>
+Runtime.version().major() :: sourceVersionGE(SourceVersion.RELEASE_10) =>
 Runtime.version().feature()
 ;;
 
-Runtime.version().minor() =>
+Runtime.version().minor() :: sourceVersionGE(SourceVersion.RELEASE_10) =>
 Runtime.version().interim()
 ;;
 
-Runtime.version().security() =>
+Runtime.version().security() :: sourceVersionGE(SourceVersion.RELEASE_10) =>
 Runtime.version().update()
 ;;
 
 // semi-deprecated since 11
-java.nio.file.Paths.get($first, $more$) :: $first instanceof String =>
+java.nio.file.Paths.get($first, $more$) :: $first instanceof String && sourceVersionGE(SourceVersion.RELEASE_11) =>
 java.nio.file.Path.of($first, $more$)
 ;;
 
-java.nio.file.Paths.get($uri) :: $uri instanceof java.net.URI =>
+java.nio.file.Paths.get($uri) :: $uri instanceof java.net.URI && sourceVersionGE(SourceVersion.RELEASE_11) =>
 java.nio.file.Path.of($uri)
 ;;
 
 // TODO: import RoundingMode somehow
 
-// BigDecimal method deprecations in 9 -> RoundingMode enum
+// BigDecimal method deprecations in 9 -> RoundingMode enum (rule valid since 5+)
 $bd.setScale($s, $mode) :: $bd instanceof java.math.BigDecimal && $s instanceof int && $mode instanceof int =>
 $bd.setScale($s, $enum) :: flag2Enum($mode, $enum)
 ;;
@@ -75,39 +75,39 @@ $bd.divide($bd2, $s, $enum) :: flag2Enum($mode, $enum)
 ;;
 
 
-// since 16
-jdk.net.Sockets.getOption($socket, $opt) :: $socket instanceof java.net.DatagramSocket && $opt instanceof java.net.SocketOption =>
+// since 16 (valid since 9)
+jdk.net.Sockets.getOption($socket, $opt) :: $socket instanceof java.net.DatagramSocket && $opt instanceof java.net.SocketOption && sourceVersionGE(SourceVersion.RELEASE_9) =>
 $socket.getOption($opt)
 ;;
 
-jdk.net.Sockets.getOption($socket, $opt) :: $socket instanceof java.net.ServerSocket && $opt instanceof java.net.SocketOption =>
+jdk.net.Sockets.getOption($socket, $opt) :: $socket instanceof java.net.ServerSocket && $opt instanceof java.net.SocketOption && sourceVersionGE(SourceVersion.RELEASE_9) =>
 $socket.getOption($opt)
 ;;
 
-jdk.net.Sockets.getOption($socket, $opt) :: $socket instanceof java.net.Socket && $opt instanceof java.net.SocketOption =>
+jdk.net.Sockets.getOption($socket, $opt) :: $socket instanceof java.net.Socket && $opt instanceof java.net.SocketOption && sourceVersionGE(SourceVersion.RELEASE_9) =>
 $socket.getOption($opt)
 ;;
 
 
-jdk.net.Sockets.setOption($socket, $opt, $v) :: $socket instanceof java.net.DatagramSocket && $opt instanceof java.net.SocketOption =>
+jdk.net.Sockets.setOption($socket, $opt, $v) :: $socket instanceof java.net.DatagramSocket && $opt instanceof java.net.SocketOption && sourceVersionGE(SourceVersion.RELEASE_9) =>
 $socket.setOption($opt, $v)
 ;;
 
-jdk.net.Sockets.setOption($socket, $opt, $v) :: $socket instanceof java.net.ServerSocket && $opt instanceof java.net.SocketOption =>
+jdk.net.Sockets.setOption($socket, $opt, $v) :: $socket instanceof java.net.ServerSocket && $opt instanceof java.net.SocketOption && sourceVersionGE(SourceVersion.RELEASE_9) =>
 $socket.setOption($opt, $v)
 ;;
 
-jdk.net.Sockets.setOption($socket, $opt, $v) :: $socket instanceof java.net.Socket && $opt instanceof java.net.SocketOption =>
+jdk.net.Sockets.setOption($socket, $opt, $v) :: $socket instanceof java.net.Socket && $opt instanceof java.net.SocketOption && sourceVersionGE(SourceVersion.RELEASE_9) =>
 $socket.setOption($opt, $v)
 ;;
 
 
-// since 14
-$socket.getLoopbackMode() :: $socket instanceof java.net.MulticastSocket =>
+// since 14 (valid since 9)
+$socket.getLoopbackMode() :: $socket instanceof java.net.MulticastSocket && sourceVersionGE(SourceVersion.RELEASE_9) =>
 $socket.getOption(java.net.StandardSocketOptions.IP_MULTICAST_LOOP)
 ;;
 
-$socket.setLoopbackMode($b):: $socket instanceof java.net.MulticastSocket && $b instanceof boolean =>
+$socket.setLoopbackMode($b):: $socket instanceof java.net.MulticastSocket && $b instanceof boolean && sourceVersionGE(SourceVersion.RELEASE_9) =>
 $socket.setOption(java.net.StandardSocketOptions.IP_MULTICAST_LOOP, $b)
 ;;
 

@@ -54,43 +54,43 @@ java.util.Collections.emptyList();;
 // prefer immutable collection for small arrays
 // not recommended for large arrays in inner loops due to the null check
 // todo: add check for $a not being an array + remove $b
-java.util.Arrays.asList($a, $b, $more$) :: !parentMatches("java.util.Collections.unmodifiableList($_)") =>
+java.util.Arrays.asList($a, $b, $more$) :: !parentMatches("java.util.Collections.unmodifiableList($_)") && sourceVersionGE(SourceVersion.RELEASE_9)  =>
 java.util.List.of($a, $b, $more$);;
 
 // shorter 9+
-java.util.Collections.singletonList($a) =>
+java.util.Collections.singletonList($a) :: sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.List.of($a);;
 
-java.util.Collections.singleton($a) =>
+java.util.Collections.singleton($a) :: sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.Set.of($a);;
 
-java.util.Collections.singletonMap($k, $v) =>
+java.util.Collections.singletonMap($k, $v) :: sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.Map.of($k, $v);;
 
 // 9+
-java.util.Collections.unmodifiableList(java.util.Arrays.asList($a$)) =>
+java.util.Collections.unmodifiableList(java.util.Arrays.asList($a$)) :: sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.List.of($a$);;
 
-java.util.Collections.unmodifiableList(java.util.List.of($a$)) =>
+java.util.Collections.unmodifiableList(java.util.List.of($a$)) :: sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.List.of($a$);;
 
-java.util.Collections.unmodifiableSet(java.util.Set.of($a$)) =>
+java.util.Collections.unmodifiableSet(java.util.Set.of($a$)) :: sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.Set.of($a$);;
 
-java.util.Collections.unmodifiableSet(new $Set<$T$>(java.util.Arrays.asList($a$))) :: $Set instanceof java.util.Set =>
+java.util.Collections.unmodifiableSet(new $Set<$T$>(java.util.Arrays.asList($a$))) :: $Set instanceof java.util.Set && sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.Set.of($a$);;
 
-java.util.Collections.unmodifiableSet(new $Set<$T$>(java.util.List.of($a$))) :: $Set instanceof java.util.Set =>
+java.util.Collections.unmodifiableSet(new $Set<$T$>(java.util.List.of($a$))) :: $Set instanceof java.util.Set && sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.Set.of($a$);;
 
 // todo: needs read only check
 "could be potentially replaced with Set.of(..) - if immutable.":
-new $Set<$T$>(java.util.Arrays.asList($a, $b, $more$)) :: $Set instanceof java.util.Set && !parentMatches("java.util.Collections.unmodifiableSet($_)") =>
+new $Set<$T$>(java.util.Arrays.asList($a, $b, $more$)) :: $Set instanceof java.util.Set && !parentMatches("java.util.Collections.unmodifiableSet($_)") && sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.Set.of($a, $b, $more$)
 ;;
 
 "could be potentially replaced with Set.of(..) - if immutable.":
-new $Set<$T$>(java.util.List.of($a, $b, $more$)) :: $Set instanceof java.util.Set && !parentMatches("java.util.Collections.unmodifiableSet($_)") =>
+new $Set<$T$>(java.util.List.of($a, $b, $more$)) :: $Set instanceof java.util.Set && !parentMatches("java.util.Collections.unmodifiableSet($_)") && sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.Set.of($a, $b, $more$)
 ;;
 

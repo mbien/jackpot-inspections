@@ -20,18 +20,18 @@ java.util.Objects.requireNonNull($o, $msg$);
 
 // 10+
 // does what it says
-$o.get() :: $o instanceof java.util.Optional =>
+$o.get() :: $o instanceof java.util.Optional && sourceVersionGE(SourceVersion.RELEASE_10) =>
 $o.orElseThrow()
 ;;
 
 // 11+
-!$o.isPresent() :: $o instanceof java.util.Optional =>
+!$o.isPresent() :: $o instanceof java.util.Optional && sourceVersionGE(SourceVersion.RELEASE_11) =>
 $o.isEmpty())
 ;;
 
 // 11+
 // similar performance, strip is unicode aware, trim is not.
-$str.trim() :: $str instanceof java.lang.String =>
+$str.trim() :: $str instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_11) =>
 $str.strip()
 ;;
 
@@ -77,16 +77,16 @@ java.io.File.pathSeparator
 ;;
 
 // 9+
-System.getProperty("java.runtime.version") =>
+System.getProperty("java.runtime.version") :: sourceVersionGE(SourceVersion.RELEASE_9) =>
 Runtime.version().toString()
 ;;
 
 // 10+
-System.getProperty("java.specification.version") =>
+System.getProperty("java.specification.version") :: sourceVersionGE(SourceVersion.RELEASE_10) =>
 Runtime.version().feature()
 ;;
 
-System.getProperty("java.version") =>
+System.getProperty("java.version") :: sourceVersionGE(SourceVersion.RELEASE_10) =>
 Runtime.version().feature()
 ;;
 

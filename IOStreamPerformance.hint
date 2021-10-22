@@ -1,9 +1,9 @@
 
-<!description="Use ByteArrayOutputStream.toString() instead of new String(bos.toByteArray()).">
+<!description="IO Stream performance rules.">
 
-
+// one variant is 10+
 "Rewrite to ByteArrayOutputStream.toByteArray().":
-new java.lang.String($bos.toByteArray(), $rest$) :: $bos instanceof java.io.ByteArrayOutputStream => 
+new java.lang.String($bos.toByteArray(), $rest$) :: $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(SourceVersion.RELEASE_10) =>
 $bos.toString($rest$)
 ;;
 

@@ -23,12 +23,12 @@ java.util.stream.Stream.empty()
 
 // 11
 "String::lines stream can be used.":
-$str.split("\n") :: $str instanceof java.lang.String =>
+$str.split("\n") :: $str instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_11) =>
 $str.lines().toArray(String[]::new)
 ;;
 
 "String::lines stream can be used.":
-$str.split("\\R") :: $str instanceof java.lang.String =>
+$str.split("\\R") :: $str instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_11) =>
 $str.lines().toArray(String[]::new)
 ;;
 
@@ -183,12 +183,12 @@ $stream.count()
 
 // simplify collectors
 // toList() shortcut 16+
-$stream.collect(java.util.stream.Collectors.toList()) :: $stream instanceof java.util.stream.Stream =>
-$stream.toList() //:: sourceVersionGE(SourceVersion.RELEASE_16)
+$stream.collect(java.util.stream.Collectors.toList()) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_16) =>
+$stream.toList()
 ;;
 
-$stream.collect(java.util.stream.Collectors.toUnmodifiableList()) :: $stream instanceof java.util.stream.Stream =>
-$stream.toList()//:: sourceVersionGE(SourceVersion.RELEASE_16)
+$stream.collect(java.util.stream.Collectors.toUnmodifiableList()) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_16) =>
+$stream.toList()
 ;;
 
 // stream.collect(counting()) -> stream.count()
