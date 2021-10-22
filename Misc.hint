@@ -26,7 +26,11 @@ $o.orElseThrow()
 
 // 11+
 !$o.isPresent() :: $o instanceof java.util.Optional && sourceVersionGE(SourceVersion.RELEASE_11) =>
-$o.isEmpty())
+$o.isEmpty()
+;;
+
+!$o.isEmpty() :: $o instanceof java.util.Optional =>
+$o.isPresent()
 ;;
 
 // 11+
