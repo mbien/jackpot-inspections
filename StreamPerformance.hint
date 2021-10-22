@@ -82,12 +82,20 @@ $stream.peek($x -> {
 ;;
 */
 
-// filter+findAny -> anyMatch
+// filter+findAny is present -> anyMatch
 $stream.filter($lambda).findAny().isPresent() :: $stream instanceof java.util.stream.Stream =>
 $stream.anyMatch($lambda)
 ;;
 
-// !filter+findAny -> noneMatch
+!$stream.filter($lambda).findAny().isEmpty() :: $stream instanceof java.util.stream.Stream =>
+ $stream.anyMatch($lambda)
+;;
+
+// filter+findAny is empty -> noneMatch
+$stream.filter($lambda).findAny().isEmpty() :: $stream instanceof java.util.stream.Stream =>
+$stream.noneMatch($lambda)
+;;
+
 !$stream.filter($lambda).findAny().isPresent() :: $stream instanceof java.util.stream.Stream =>
  $stream.noneMatch($lambda)
 ;;
