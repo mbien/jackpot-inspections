@@ -1,5 +1,5 @@
 
-<!description="Replace obsolete Collections.">
+<!description="Refactor to modern Collection APIs and idioms.">
 
 // replace old collections
 java.util.Stack =>
@@ -14,24 +14,28 @@ java.util.ArrayList;;
 java.util.Hashtable =>
 java.util.HashMap;;
 
-/*
 $modifiers$ java.util.Stack<$g> $name = new java.util.Stack<$g$>(); =>
-$modifiers$ java.util.ArrayDeque<$g> $name = new java.util.ArrayDeque<$g$>();
+$modifiers$ java.util.Deque<$g> $name = new java.util.ArrayDeque<$g$>();
 ;;
 
+/*
 $modifiers$ java.util.Stack<$g> $name = $initializer; =>
-$modifiers$ java.util.ArrayDeque<$g> $name = $initializer;
+$modifiers$ java.util.Deque<$g> $name = $initializer;
 ;;
 
 $modifiers$ java.util.Stack<$g> $name; =>
-$modifiers$ java.util.ArrayDeque<$g> $name;
+$modifiers$ java.util.Deque<$g> $name;
 ;;
 
 new java.util.Stack<$g$>() =>
-new java.util.ArrayDeque<$g$>()
+new java.util.Deque<$g$>()
 ;;
 */
 
+// maps to Collection interface post refactoring
+$stack.empty() :: $stack instanceof java.util.Stack =>
+$stack.isEmpty()
+;;
 
 // avoid raw type warnings
 java.util.Collections.EMPTY_LIST =>
@@ -50,10 +54,10 @@ java.util.Collections.emptyList();;
 // prefer immutable collection for small arrays
 // not recommended for large arrays in inner loops due to the null check
 // todo: add check for $a not being an array + remove $b
-java.util.Arrays.asList($a, $b, $more$) =>
+java.util.Arrays.asList($a, $b, $more$) :: !parentMatches("java.util.Collections.unmodifiableList($_)") =>
 java.util.List.of($a, $b, $more$);;
 
-// shorter
+// shorter 9+
 java.util.Collections.singletonList($a) =>
 java.util.List.of($a);;
 
@@ -67,8 +71,29 @@ java.util.Map.of($k, $v);;
 java.util.Collections.unmodifiableList(java.util.Arrays.asList($a$)) =>
 java.util.List.of($a$);;
 
-java.util.Collections.unmodifiableSet(new java.util.HashSet<>(java.util.Arrays.asList($a$))) =>
+java.util.Collections.unmodifiableList(java.util.List.of($a$)) =>
+java.util.List.of($a$);;
+
+java.util.Collections.unmodifiableSet(java.util.Set.of($a$)) =>
 java.util.Set.of($a$);;
+
+java.util.Collections.unmodifiableSet(new $Set<$T$>(java.util.Arrays.asList($a$))) :: $Set instanceof java.util.Set =>
+java.util.Set.of($a$);;
+
+java.util.Collections.unmodifiableSet(new $Set<$T$>(java.util.List.of($a$))) :: $Set instanceof java.util.Set =>
+java.util.Set.of($a$);;
+
+// todo: needs read only check
+"could be potentially replaced with Set.of(..) - if immutable.":
+new $Set<$T$>(java.util.Arrays.asList($a, $b, $more$)) :: $Set instanceof java.util.Set && !parentMatches("java.util.Collections.unmodifiableSet($_)") =>
+java.util.Set.of($a, $b, $more$)
+;;
+
+"could be potentially replaced with Set.of(..) - if immutable.":
+new $Set<$T$>(java.util.List.of($a, $b, $more$)) :: $Set instanceof java.util.Set && !parentMatches("java.util.Collections.unmodifiableSet($_)") =>
+java.util.Set.of($a, $b, $more$)
+;;
+
 
 // prefer list.sort()
 // less readable
@@ -85,12 +110,12 @@ $col.addAll(java.util.Arrays.asList($array$));;
 
 // prefer copy constructor over addAll()
 $more$ $col = new $Col();
-$col.addAll($other); =>
+$col.addAll($other); :: $Col instanceof java.util.Collection =>
 $more$ $col = new $Col($other);
 ;;
 
 $more$ $map = new $Map();
-$map.putAll($other); =>
+$map.putAll($other); :: $Map instanceof java.util.Map =>
 $more$ $map = new $Map($other);
 ;;
 

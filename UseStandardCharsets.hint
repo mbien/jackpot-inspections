@@ -19,7 +19,7 @@ java.net.URLEncoder.encode($s, $charset) :: string2Charset($str, $charset);;
 */
 
 // URLEncoder and URLDecoder
-java.net.URLEncoder.encode($s, "UTF-8") :: $str instanceof java.lang.String =>
+java.net.URLEncoder.encode($s, "UTF-8") :: $s instanceof java.lang.String =>
 java.net.URLEncoder.encode($s, java.nio.charset.StandardCharsets.UTF_8);;
 
 java.net.URLDecoder.decode($s, "UTF-8") :: $s instanceof java.lang.String =>

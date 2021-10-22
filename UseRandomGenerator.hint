@@ -2,6 +2,8 @@
 import javax.lang.model.element.ElementKind;
 ?>
 
+<!description="Introduce java.util.random.* API.">
+
 // declarations
 $modifiers$ java.util.Random $rng; =>
 $modifiers$ java.util.random.RandomGenerator $rng;
