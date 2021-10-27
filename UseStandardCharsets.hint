@@ -9,8 +9,23 @@ import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.*;
 ?>
 
+<!description="Use StandardCharset constants instead of String lookup and other improvements to Charsets.">
 
-<!description="Use StandardCharsets.UTF_8 constant instead of 'UTF-8' String lookup.">
+
+java.nio.charset.Charset.forName("UTF-8") =>
+java.nio.charset.StandardCharsets.UTF_8
+;;
+/*
+// 18+
+try {
+    $cs = java.nio.charset.Charset.forName($name);
+} catch ($Exception $ex) {
+    $cs = $default;
+} :: $name instanceof String && $cs instanceof java.nio.charset.Charset && $default instanceof java.nio.charset.Charset && sourceVersionGE(SourceVersion.RELEASE_18)
+=>
+$cs = java.nio.charset.Charset.forName($name, $default);
+;;
+*/
 
 // todo: import StandardCharsets somehow to unblock this
 /*
