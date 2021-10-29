@@ -159,3 +159,16 @@ while (true) {
 =>
 $in.transferTo($out);
 ;;
+
+// todo: check prev writes to bos
+"instream.readAllBytes() could be potentially used.":
+$in.transferTo($bos);
+$more$ $bytes = $bos.toByteArray(); :: $in instanceof java.io.InputStream && $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(SourceVersion.RELEASE_9) =>
+$more$ $bytes = $in.readAllBytes();
+;;
+
+"instream.readAllBytes() could be potentially used.":
+$in.transferTo($bos);
+return $bos.toByteArray(); :: $in instanceof java.io.InputStream && $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(SourceVersion.RELEASE_9) =>
+return $in.readAllBytes();
+;;
