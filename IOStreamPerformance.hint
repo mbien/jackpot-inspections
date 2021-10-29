@@ -92,25 +92,50 @@ if ($old.exists()) {
 java.nio.file.Files.deleteIfExists($old.toPath());
 ;;
 
+
 // Files.copy() uses the filesystem directly to copy files
 "Files.copy() can be used.":
-try ($IS $fis = java.nio.file.Files.newInputStream($p1);
-     $OS $fos = java.nio.file.Files.newOutputStream($p2)) {
+try ($IS$ $fis = java.nio.file.Files.newInputStream($p1);
+     $OS$ $fos = java.nio.file.Files.newOutputStream($p2)) {
     $fis.transferTo($fos);
 } :: $p1 instanceof java.nio.file.Path && $p2 instanceof java.nio.file.Path
 =>
-java.nio.file.Files.copy($p1, $p2);
+java.nio.file.Files.copy($p1, $p2, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
 ;;
 
 "Files.copy() can be used.":
-try ($IS $fis = new java.io.FileInputStream($s1);
-     $OS $fos = new java.io.FileOutputStream($s2)) {
+try ($IS$ $fis = new java.io.BufferedInputStream(java.nio.file.Files.newInputStream($p1));
+     $OS$ $fos = new java.io.BufferedOutputStream(java.nio.file.Files.newOutputStream($p2))) {
+    $fis.transferTo($fos);
+} :: $p1 instanceof java.nio.file.Path && $p2 instanceof java.nio.file.Path
+=>
+java.nio.file.Files.copy($p1, $p2, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+;;
+
+"Files.copy() can be used.":
+try ($IS$ $fis = new java.io.FileInputStream($s1);
+     $OS$ $fos = new java.io.FileOutputStream($s2)) {
     $fis.transferTo($fos);
 }
 =>
-java.nio.file.Files.copy(java.nio.file.Path.of($s1), java.nio.file.Path.of($s2)); :: $s1 instanceof String && $s2 instanceof String
+java.nio.file.Files.copy(java.nio.file.Path.of($s1), java.nio.file.Path.of($s2), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+    :: $s1 instanceof String && $s2 instanceof String
 =>
-java.nio.file.Files.copy($s1.toPath(), $s2.toPath()); :: $s1 instanceof java.io.File && $s2 instanceof java.io.File
+java.nio.file.Files.copy($s1.toPath(), $s2.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+    :: $s1 instanceof java.io.File && $s2 instanceof java.io.File
+;;
+
+"Files.copy() can be used.":
+try ($IS$ $fis = new java.io.BufferedInputStream(new java.io.FileInputStream($s1));
+     $OS$ $fos = java.io.BufferedOutputStream(new java.io.FileOutputStream($s2))) {
+    $fis.transferTo($fos);
+}
+=>
+java.nio.file.Files.copy(java.nio.file.Path.of($s1), java.nio.file.Path.of($s2), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+    :: $s1 instanceof String && $s2 instanceof String
+=>
+java.nio.file.Files.copy($s1.toPath(), $s2.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+    :: $s1 instanceof java.io.File && $s2 instanceof java.io.File
 ;;
 
 
