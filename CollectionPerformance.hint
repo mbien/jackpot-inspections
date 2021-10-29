@@ -54,7 +54,7 @@ java.util.Collections.emptyList();;
 // prefer immutable collection for small arrays
 // not recommended for large arrays in inner loops due to the null check
 // todo: add check for $a not being an array + remove $b
-java.util.Arrays.asList($a, $b, $more$) :: !parentMatches("java.util.Collections.unmodifiableList($_)") && sourceVersionGE(SourceVersion.RELEASE_9)  =>
+java.util.Arrays.asList($a, $b, $more$) :: !parentMatches("java.util.Collections.unmodifiableList($_)") && sourceVersionGE(SourceVersion.RELEASE_9) =>
 java.util.List.of($a, $b, $more$);;
 
 // shorter 9+
@@ -227,4 +227,38 @@ for (java.util.Iterator<$T> $it = $col.iterator(); $it.hasNext(); ) {
 } :: $col instanceof java.util.Collection
 =>
 $col.removeIf($t -> $condition);
+;;
+
+
+// URLs as keys can caue performance problems
+// set + URL
+"URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
+new $SET<java.net.URL>($args$) :: $SET instanceof java.util.Set =>
+new $SET<java.net.URI>($args$)
+;;
+
+"URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
+$SET<java.net.URL> $set = $init$; :: $set instanceof java.util.Set =>
+$SET<java.net.URI> $set = $init$;
+;;
+
+"URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
+$set.add($key) :: $set instanceof java.util.Set && $key instanceof java.net.URL =>
+$set.add($key.toURI())
+;;
+
+// map + URL
+"URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
+new $MAP<java.net.URL, $V>($args$) :: $MAP instanceof java.util.Map =>
+new $MAP<java.net.URI, $V>($args$)
+;;
+
+"URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
+$MAP<java.net.URL, $V> $map = $init$; :: $MAP instanceof java.util.Map =>
+$MAP<java.net.URI, $V> $map = $init$;
+;;
+
+"URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
+$map.put($key, $value) :: $map instanceof java.util.Map && $key instanceof java.net.URL =>
+$map.put($key.toURI(), $value)
 ;;
