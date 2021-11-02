@@ -112,7 +112,6 @@ $socket.setOption(java.net.StandardSocketOptions.IP_MULTICAST_LOOP, $b)
 ;;
 
 
-
 // since 17
 
 // todo: doesn't work, body is not captured
@@ -128,6 +127,20 @@ java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<V
 $body$;
 ;;
 */
+
+
+// 18+ (JEP 421) but applicable from 9+
+"finalization is deprecated, consider try-with-resource or java.lang.ref.Cleaner.":
+$rt.runFinalization(); :: $rt instanceof java.lang.Runtime && sourceVersionGE(SourceVersion.RELEASE_9);;
+
+"finalization is deprecated, consider try-with-resource or java.lang.ref.Cleaner.":
+java.lang.System.runFinalization(); :: sourceVersionGE(SourceVersion.RELEASE_9);;
+
+"finalization is deprecated, consider try-with-resource or java.lang.ref.Cleaner.":
+$mods$ void finalize() throws Throwable {$body$;} :: sourceVersionGE(SourceVersion.RELEASE_9);;
+
+"finalization is deprecated, consider try-with-resource or java.lang.ref.Cleaner.":
+$obj.finalize(); :: sourceVersionGE(SourceVersion.RELEASE_9);;
 
 <?
 public boolean flag2Enum(Variable str, Variable target) throws Throwable {
