@@ -94,6 +94,9 @@ System.getProperty("java.version") :: sourceVersionGE(SourceVersion.RELEASE_10) 
 Runtime.version().feature()
 ;;
 
+"URL.equals() resolves the host and compares the target, this is a blocking operation. Consider comparing URIs or Strings instead.":
+$url1.equals($url2) :: $url1 instanceof java.net.URL && $url2 instanceof java.net.URL;;
+
 /* todo: should be a hint but no warning
 
 "use Long::hashCode for better hash code distribution.":
