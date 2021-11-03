@@ -32,6 +32,18 @@ $str.split("\\R") :: $str instanceof java.lang.String && sourceVersionGE(SourceV
 $str.lines().toArray(String[]::new)
 ;;
 
+// 9/16+
+"Stream::toList can be used.":
+java.util.List.of($stream.toArray($T[]::new)) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_9) =>
+$stream.toList(); :: sourceVersionGE(SourceVersion.RELEASE_16) =>
+$stream.collect(java.util.stream.Collectors.toList()) :: otherwise
+;;
+
+"Stream::toList can be used.":
+java.util.Arrays.asList($stream.toArray($T[]::new)) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_9) =>
+$stream.toList(); :: sourceVersionGE(SourceVersion.RELEASE_16) =>
+$stream.collect(java.util.stream.Collectors.toList()) :: otherwise
+;;
 
 // shorter and faster
 // https://bugs.openjdk.java.net/browse/JDK-8265237
