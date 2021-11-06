@@ -142,6 +142,18 @@ $mods$ void finalize() throws Throwable {$body$;} :: sourceVersionGE(SourceVersi
 "finalization is deprecated, consider try-with-resource or java.lang.ref.Cleaner.":
 $obj.finalize(); :: sourceVersionGE(SourceVersion.RELEASE_9);;
 
+
+// 18+ but applicable from 1+
+"automatic tokenizeng of the command is error prone, consider using array versions of this method or ProcessBuilder.":
+$rt.exec($cmd) :: $rt instanceof java.lang.Runtime && $cmd instanceof String;;
+
+"automatic tokenizeng of the command is error prone, consider using array versions of this method or ProcessBuilder.":
+$rt.exec($cmd, $env) :: $rt instanceof java.lang.Runtime && $cmd instanceof String && $env instanceof String[];;
+
+"automatic tokenizeng of the command is error prone, consider using array versions of this method or ProcessBuilder.":
+$rt.exec($cmd, $env, $file) :: $rt instanceof java.lang.Runtime && $cmd instanceof String && $env instanceof String[] && $file instanceof java.io.File;;
+
+
 <?
 public boolean flag2Enum(Variable str, Variable target) throws Throwable {
     
