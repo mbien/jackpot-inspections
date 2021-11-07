@@ -16,10 +16,36 @@ java.util.Collections.singleton($s).stream() =>
 java.util.stream.Stream.of($s)
 ;;
 
-// Collections.emptyList().stream() -> Stream.empty()
+java.util.Collections.singletonList($s).stream() =>
+java.util.stream.Stream.of($s)
+;;
+
+// Collections.emptyCol().stream() -> Stream.empty()
 java.util.Collections.emptyList().stream() =>
 java.util.stream.Stream.empty()
 ;;
+
+java.util.Collections.emptySet().stream() =>
+java.util.stream.Stream.empty()
+;;
+
+java.util.Collections.emptySortedSet().stream() =>
+java.util.stream.Stream.empty()
+;;
+
+java.util.Collections.emptyNavigableSet().stream() =>
+java.util.stream.Stream.empty()
+;;
+
+// other empty immutables -> Stream.empty()
+java.util.List.of().stream() =>
+java.util.stream.Stream.empty()
+;;
+
+java.util.Set.of().stream() =>
+java.util.stream.Stream.empty()
+;;
+
 
 // 11
 "String::lines stream can be used.":
