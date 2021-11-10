@@ -39,6 +39,17 @@ $str.trim() :: $str instanceof java.lang.String && sourceVersionGE(SourceVersion
 $str.strip()
 ;;
 
+// currently compiles into invokedynamic / makeConcatWithConstants
+// valueOf is more direct, needs no warmup and has specialized variants.
+// javac RFE https://bugs.openjdk.java.net/browse/JDK-8276951
+"" + $val =>
+String.valueOf($val)
+;;
+
+$val + "" =>
+String.valueOf($val)
+;;
+
 // TODO: doesn't work, jackpot ignores the body. Looks like a bug.
 /*
 if ($o != null) {
