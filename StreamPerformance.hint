@@ -71,6 +71,12 @@ $stream.toList(); :: sourceVersionGE(SourceVersion.RELEASE_16) =>
 $stream.collect(java.util.stream.Collectors.toList()) :: otherwise
 ;;
 
+"Stream::toArray can be used.":
+$stream.toList().toArray($T[]::new) :: $stream instanceof java.util.stream.Stream =>
+$stream.toArray($T[]::new)
+;;
+
+
 // shorter and faster
 // https://bugs.openjdk.java.net/browse/JDK-8265237
 "String::join can be used.":
