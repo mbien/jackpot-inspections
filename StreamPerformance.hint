@@ -1,5 +1,5 @@
 
-<!description="Improve stream call chain.">
+<!description="Improve stream call chains and other java.util.stream.Stream related inspections.">
 
 // Stream.empty uses a constant internally + is more descriptive
 java.util.stream.Stream.of() =>
@@ -225,8 +225,10 @@ $stream.toList().size() :: $stream instanceof java.util.stream.Stream =>
 $stream.count()
 ;;
 
+
 // simplify collectors
 // toList() shortcut 16+
+"could be potentially changed to stream.toList(), if unmodifiable.":
 $stream.collect(java.util.stream.Collectors.toList()) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_16) =>
 $stream.toList()
 ;;
@@ -234,6 +236,76 @@ $stream.toList()
 $stream.collect(java.util.stream.Collectors.toUnmodifiableList()) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_16) =>
 $stream.toList()
 ;;
+
+// default impls
+java.util.stream.Collectors.toCollection(java.util.ArrayList::new) =>
+java.util.stream.Collectors.toList()
+;;
+
+java.util.stream.Collectors.toCollection(java.util.HashSet::new) =>
+java.util.stream.Collectors.toSet()
+;;
+
+java.util.stream.Collectors.toMap($keymapper, $valuemapper, $merger, java.util.HashMap::new) =>
+java.util.stream.Collectors.toMap($keymapper, $valuemapper, $merger)
+;;
+
+java.util.stream.Collectors.toConcurrentMap($keymapper, $valuemapper, $merger, java.util.concurrent.ConcurrentHashMap::new) =>
+java.util.stream.Collectors.toConcurrentMap($keymapper, $valuemapper, $merger)
+;;
+
+// redundant distinct() or sorted() before toSet()
+"distinct() is redundant before Set collectors.":
+$stream.distinct().collect(java.util.stream.Collectors.toSet()) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toSet())
+;;
+
+"distinct() is redundant before Set collectors.":
+$stream.distinct().collect(java.util.stream.Collectors.toUnmodifiableSet()) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toUnmodifiableSet())
+;;
+
+"sorted() is redundant before unordered Set collectors.":
+$stream.sorted($comp$).collect(java.util.stream.Collectors.toSet()) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toSet())
+;;
+
+"sorted() is redundant before unordered Set collectors.":
+$stream.sorted($comp$).collect(java.util.stream.Collectors.toUnmodifiableSet()) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toUnmodifiableSet())
+;;
+
+// redundant sort before toMap()
+"sorted() is redundant before unordered Map collectors.":
+$stream.sorted($comp$).collect(java.util.stream.Collectors.toMap($keymapper, $valuemapper)) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toMap($keymapper, $valuemapper))
+;;
+
+"sorted() is redundant before unordered Map collectors.":
+$stream.sorted($comp$).collect(java.util.stream.Collectors.toConcurrentMap($keymapper, $valuemapper)) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toConcurrentMap($keymapper, $valuemapper))
+;;
+
+"sorted() is redundant before unordered Map collectors.":
+$stream.sorted($comp$).collect(java.util.stream.Collectors.toUnmodifiableMap($keymapper, $valuemapper)) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toUnmodifiableMap($keymapper, $valuemapper))
+;;
+
+"sorted() could be potentially removed if the merge function does not require ordering, the resulting map is unordered.":
+$stream.sorted($comp$).collect(java.util.stream.Collectors.toMap($keymapper, $valuemapper, $merger)) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toMap($keymapper, $valuemapper, $merger))
+;;
+
+"sorted() could be potentially removed if the merge function does not require ordering, the resulting map is unordered.":
+$stream.sorted($comp$).collect(java.util.stream.Collectors.toConcurrentMap($keymapper, $valuemapper, $merger)) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toConcurrentMap($keymapper, $valuemapper, $merger))
+;;
+
+"sorted() could be potentially removed if the merge function does not require ordering, the resulting map is unordered.":
+$stream.sorted($comp$).collect(java.util.stream.Collectors.toUnmodifiableMap($keymapper, $valuemapper, $merger)) :: $stream instanceof java.util.stream.Stream =>
+$stream.collect(java.util.stream.Collectors.toUnmodifiableMap($keymapper, $valuemapper, $merger))
+;;
+
 
 // stream.collect(counting()) -> stream.count()
 $stream.collect(java.util.stream.Collectors.counting()) :: $stream instanceof java.util.stream.Stream =>
