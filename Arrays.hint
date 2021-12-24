@@ -1,0 +1,49 @@
+
+<!description="Use vectorized java.util.Arrays.* utility methods.">
+
+// fill
+for(int $i = $from; $i < $to; $i++) {
+    $array[$i] = $n;
+}
+=>
+java.util.Arrays.fill($array, $n);             :: matchesAny($from, "0") && matchesAny($to, "$array.length")
+=>
+java.util.Arrays.fill($array, $from, $to, $n); :: otherwise
+;;
+
+
+// copy
+$T[] $copy = new $T[$length];
+System.arraycopy($src, $srcPos, $copy, 0, $length);                          :: $srcPos instanceof int && $length instanceof int
+=>
+$T[] $copy = java.util.Arrays.copyOf($src, $length);                         :: matchesAny($srcPos, "0")
+=>
+$T[] $copy = java.util.Arrays.copyOfRange($src, $srcPos, $srcPos + $length); :: otherwise
+;;
+
+java.util.Arrays.copyOfRange($array, 0, $length)                             :: $length instanceof int
+=>
+java.util.Arrays.copyOf($array, $length)
+;;
+
+
+// equals
+for (int $i = 0; $i < $array1.length; $i++) {
+    if ($array1[$i] != $array2[$i]) {
+        $equals = false;
+        break;
+    }
+} :: $equals instanceof boolean
+=>
+$equals = java.util.Arrays.equals($array1, $array2);
+;;
+
+for (int $i = 0; $i < $array1.length; $i++) {
+    if ($array1[$i] != $array2[$i]) {
+        return false;
+    }
+}
+return true;
+=>
+return java.util.Arrays.equals($array1, $array2);
+;;
