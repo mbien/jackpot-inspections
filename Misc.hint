@@ -18,6 +18,37 @@ if ($o == null) {
 java.util.Objects.requireNonNull($o, $msg$);
 ;;
 
+// TODO: doesn't work, jackpot ignores the body. bug?
+/*
+if ($o != null) {
+$body$;
+} else {
+    throw new NullPointerException($msg$);
+}
+=>
+java.util.Objects.requireNonNull($o, $msg$);
+$body$;
+;;
+*/
+
+// shorter equals
+$obj != null ? $obj.equals($other) : $other == null =>
+java.util.Objects.equals($obj, $other)
+;;
+
+$obj != null ? !$obj.equals($other) : $other != null =>
+!java.util.Objects.equals($obj, $other)
+;;
+
+($obj == $other) || ($obj != null && $obj.equals($other)) =>
+java.util.Objects.equals($obj, $other)
+;;
+
+($obj != $other) || ($obj != null && !$obj.equals($other)) =>
+!java.util.Objects.equals($obj, $other)
+;;
+
+
 // 10+
 // does what it says
 $o.get() :: $o instanceof java.util.Optional && sourceVersionGE(SourceVersion.RELEASE_10) =>
@@ -49,19 +80,6 @@ String.valueOf($val)
 $val + "" =>
 String.valueOf($val)
 ;;
-
-// TODO: doesn't work, jackpot ignores the body. Looks like a bug.
-/*
-if ($o != null) {
-$body$;
-} else {
-    throw new NullPointerException($msg$);
-}
-=>
-java.util.Objects.requireNonNull($o, $msg$);
-$body$;
-;;
-*/
 
 /* TODO: doesn't work unless there is a way to create constants
 "extract Pattern constant.":
