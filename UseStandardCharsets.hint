@@ -119,6 +119,15 @@ $p.storeToXML($os, $c, "UTF-8") :: $p instanceof java.util.Properties && $os ins
 $p.storeToXML($os, $c, java.nio.charset.StandardCharsets.UTF_8);;
 
 
+// internal API
+sun.nio.cs.ThreadLocalCoders.encoderFor("UTF-8") =>
+java.nio.charset.StandardCharsets.UTF_8.newEncoder()
+;;
+
+sun.nio.cs.ThreadLocalCoders.decoderFor("UTF-8") =>
+java.nio.charset.StandardCharsets.UTF_8.newDecoder()
+;;
+
 
 <?
 public boolean string2Charset(Variable str, Variable target) throws Throwable {
