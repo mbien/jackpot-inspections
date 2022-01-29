@@ -1,10 +1,18 @@
+<?
+import java.lang.reflect.Method;
+import com.sun.source.util.*;
+import com.sun.source.tree.Tree.Kind;
+import javax.lang.model.util.*;
+import javax.lang.model.element.*;
+import static javax.lang.model.element.ElementKind.*;
+?>
 
 <!description="Use vectorized java.util.Arrays.* utility methods.">
 
 // fill
 for(int $i = $from; $i < $to; $i++) {
     $array[$i] = $n;
-}
+}                                              :: hasNoSideEffect($n) && !referencedIn($i, $n) && !matchesAny($n, "$i")
 =>
 java.util.Arrays.fill($array, $n);             :: matchesAny($from, "0") && matchesAny($to, "$array.length")
 =>
@@ -47,3 +55,33 @@ return true;
 =>
 return java.util.Arrays.equals($array1, $array2);
 ;;
+
+
+<?
+    public boolean hasNoSideEffect(Variable var) throws Throwable {
+        ElementKind kind = context.elementKind(var);
+        return kind == LOCAL_VARIABLE || kind == FIELD || kind == PARAMETER || isLiteral(var);
+    }
+
+    public boolean isLiteral(Variable var) throws Throwable {
+
+        Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
+        m.setAccessible(true);
+        TreePath tp = (TreePath) m.invoke(context, var);
+
+        switch (tp.getLeaf().getKind()) {
+            case INT_LITERAL:
+            case LONG_LITERAL:
+            case FLOAT_LITERAL:
+            case DOUBLE_LITERAL:
+            case BOOLEAN_LITERAL:
+            case CHAR_LITERAL:
+            case STRING_LITERAL:
+            case NULL_LITERAL:
+                return true;
+        }
+
+        return false;
+    }
+
+?>
