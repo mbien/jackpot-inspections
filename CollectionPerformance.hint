@@ -243,7 +243,7 @@ $SET<java.net.URI> $set = $init$;
 ;;
 
 "URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
-$set.add($key) :: $set instanceof java.util.Set && $key instanceof java.net.URL =>
+$set.add($key) :: $set instanceof java.util.Set<java.net.URL> && $key instanceof java.net.URL =>
 $set.add($key.toURI())
 ;;
 
@@ -259,6 +259,6 @@ $MAP<java.net.URI, $V> $map = $init$;
 ;;
 
 "URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
-$map.put($key, $value) :: $map instanceof java.util.Map && $key instanceof java.net.URL =>
+$map.put($key, $value) :: $map instanceof java.util.Map<java.net.URL, ?> && $key instanceof java.net.URL =>
 $map.put($key.toURI(), $value)
 ;;
