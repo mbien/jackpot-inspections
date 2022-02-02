@@ -12,7 +12,7 @@ import static javax.lang.model.element.ElementKind.*;
 // fill
 for(int $i = $from; $i < $to; $i++) {
     $array[$i] = $n;
-}                                              :: hasNoSideEffect($n) && !referencedIn($i, $n) && !matchesAny($n, "$i")
+}                                              :: hasNoSideEffect($n) && !referencedIn($i, $n)
 =>
 java.util.Arrays.fill($array, $n);             :: matchesAny($from, "0") && matchesAny($to, "$array.length")
 =>

@@ -5,17 +5,17 @@ import javax.lang.model.element.ElementKind;
 <!description="Introduce java.util.random.* API.">
 
 // declarations
-$modifiers$ java.util.Random $rng; :: sourceVersionGE(SourceVersion.RELEASE_17) =>
+$modifiers$ java.util.Random $rng; :: sourceVersionGE(17) =>
 $modifiers$ java.util.random.RandomGenerator $rng;
 ;;
 
-$modifiers$ java.util.Random $rng = $initializer; :: sourceVersionGE(SourceVersion.RELEASE_17) =>
+$modifiers$ java.util.Random $rng = $initializer; :: sourceVersionGE(17) =>
 $modifiers$ java.util.random.RandomGenerator $rng = $initializer;
 ;;
 
 // assignments
 // should be '$rng super java.util.random.RandomGenerator'
-$rng = new java.util.Random($seed$) :: !$rng instanceof java.util.Random && sourceVersionGE(SourceVersion.RELEASE_17)
+$rng = new java.util.Random($seed$) :: !$rng instanceof java.util.Random && sourceVersionGE(17)
 => $rng = java.util.random.RandomGeneratorFactory.of("Random").create($seed$)
 => $rng = java.util.random.RandomGeneratorFactory.getDefault().create($seed$)
 => $rng = RandomGenerator.getDefault()
@@ -23,7 +23,7 @@ $rng = new java.util.Random($seed$) :: !$rng instanceof java.util.Random && sour
 
 // this is redundant but required because the above hack does not catch
 // RandomGenerator old2 = new Random() for some reason
-java.util.random.RandomGenerator $rng = new java.util.Random($seed$) && sourceVersionGE(SourceVersion.RELEASE_17)
+java.util.random.RandomGenerator $rng = new java.util.Random($seed$) && sourceVersionGE(17)
 => java.util.random.RandomGenerator $rng = java.util.random.RandomGeneratorFactory.of("Random").create($seed$)
 => java.util.random.RandomGenerator $rng = java.util.random.RandomGeneratorFactory.getDefault().create($seed$)
 => java.util.random.RandomGenerator $rng = RandomGenerator.getDefault()
@@ -31,7 +31,7 @@ java.util.random.RandomGenerator $rng = new java.util.Random($seed$) && sourceVe
 
 
 // passed as value to methods or constructors
-new java.util.Random($seed$) :: isPassedToMethod() && sourceVersionGE(SourceVersion.RELEASE_17)
+new java.util.Random($seed$) :: isPassedToMethod() && sourceVersionGE(17)
 => java.util.random.RandomGeneratorFactory.of("Random").create($seed$)
 => java.util.random.RandomGeneratorFactory.getDefault().create($seed$)
 => RandomGenerator.getDefault()

@@ -4,27 +4,27 @@
 // todo: add strip() rules
 
 // String.isBlank() 11+
-$str.trim().isEmpty() :: $str instanceof String && sourceVersionGE(SourceVersion.RELEASE_11) =>
+$str.trim().isEmpty() :: $str instanceof String && sourceVersionGE(11) =>
 $str.isBlank()
 ;;
 
-$str.trim().equals("") :: $str instanceof String && sourceVersionGE(SourceVersion.RELEASE_11) =>
+$str.trim().equals("") :: $str instanceof String && sourceVersionGE(11) =>
 $str.isBlank()
 ;;
 
-"".equals($str.trim()) :: $str instanceof String && sourceVersionGE(SourceVersion.RELEASE_11) =>
+"".equals($str.trim()) :: $str instanceof String && sourceVersionGE(11) =>
 $str.isBlank()
 ;;
 
-$str.trim().length() == 0 :: $str instanceof String && sourceVersionGE(SourceVersion.RELEASE_11) =>
+$str.trim().length() == 0 :: $str instanceof String && sourceVersionGE(11) =>
 $str.isBlank()
 ;;
 
-$str.trim().length() != 0 :: $str instanceof String && sourceVersionGE(SourceVersion.RELEASE_11) =>
+$str.trim().length() != 0 :: $str instanceof String && sourceVersionGE(11) =>
 !$str.isBlank()
 ;;
 
-$str.trim().length() > 0 :: $str instanceof String && sourceVersionGE(SourceVersion.RELEASE_11) =>
+$str.trim().length() > 0 :: $str instanceof String && sourceVersionGE(11) =>
 !$str.isBlank()
 ;;
 

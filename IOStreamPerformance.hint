@@ -3,19 +3,19 @@
 
 
 new java.io.File($s).toPath()
-=>  java.nio.file.Path.of($s)   :: sourceVersionGE(SourceVersion.RELEASE_11)
+=>  java.nio.file.Path.of($s)   :: sourceVersionGE(11)
 =>  java.nio.file.Paths.get($s) :: otherwise
 ;;
 
 new java.io.File($s, $c).toPath()   :: $s instanceof String && $c instanceof String
-=>  java.nio.file.Path.of($s, $c)   :: sourceVersionGE(SourceVersion.RELEASE_11)
+=>  java.nio.file.Path.of($s, $c)   :: sourceVersionGE(11)
 =>  java.nio.file.Paths.get($s, $c) :: otherwise
 ;;
 
 
 // one variant is 10+
 "Rewrite to ByteArrayOutputStream.toByteArray().":
-new java.lang.String($bos.toByteArray(), $rest$) :: $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(SourceVersion.RELEASE_10) =>
+new java.lang.String($bos.toByteArray(), $rest$) :: $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(10) =>
 $bos.toString($rest$)
 ;;
 
@@ -40,7 +40,7 @@ $mods$ java.io.InputStream $is = java.nio.file.Files.newInputStream($f.toPath())
 
 "Files.newInputStream() can be used.":
 $mods$ $type$ $is = new java.io.FileInputStream($s); :: $s instanceof java.lang.String
-=>  $mods$ java.io.InputStream $is = java.nio.file.Files.newInputStream(java.nio.file.Path.of($s))   :: sourceVersionGE(SourceVersion.RELEASE_11)
+=>  $mods$ java.io.InputStream $is = java.nio.file.Files.newInputStream(java.nio.file.Path.of($s))   :: sourceVersionGE(11)
 =>  $mods$ java.io.InputStream $is = java.nio.file.Files.newInputStream(java.nio.file.Paths.get($s)) :: otherwise
 ;;
 
@@ -51,7 +51,7 @@ $mods$ java.io.OutputStream $os = java.nio.file.Files.newOutputStream($f.toPath(
 
 "Files.newOutputStream() can be used.":
 $mods$ $type$ $os = new java.io.FileOutputStream($s); :: $s instanceof java.lang.String
-=>  $mods$ java.io.OutputStream $os = java.nio.file.Files.newOutputStream(java.nio.file.Path.of($s))   :: sourceVersionGE(SourceVersion.RELEASE_11)
+=>  $mods$ java.io.OutputStream $os = java.nio.file.Files.newOutputStream(java.nio.file.Path.of($s))   :: sourceVersionGE(11)
 =>  $mods$ java.io.OutputStream $os = java.nio.file.Files.newOutputStream(java.nio.file.Paths.get($s)) :: otherwise
 ;;
 
@@ -63,7 +63,7 @@ java.nio.file.Files.newBufferedReader($f.toPath())
 
 "Files.newBufferedReader() can be used.":
 new java.io.BufferedReader(new java.io.InputStreamReader(new java.io.FileInputStream($s))) :: $s instanceof String
-=>  java.nio.file.Files.newBufferedReader(java.nio.file.Path.of($s))   :: sourceVersionGE(SourceVersion.RELEASE_11)
+=>  java.nio.file.Files.newBufferedReader(java.nio.file.Path.of($s))   :: sourceVersionGE(11)
 =>  java.nio.file.Files.newBufferedReader(java.nio.file.Paths.get($s)) :: otherwise
 ;;
 
@@ -74,7 +74,7 @@ java.nio.file.Files.newBufferedWriter($f.toPath())
 
 "Files.newBufferedWriter() can be used.":
 new java.io.BufferedWriter(new java.io.OutputStreamWriter(new java.io.FileOutputStream($s))) :: $s instanceof String
-=>  java.nio.file.Files.newBufferedWriter(java.nio.file.Path.of($s))   :: sourceVersionGE(SourceVersion.RELEASE_11)
+=>  java.nio.file.Files.newBufferedWriter(java.nio.file.Path.of($s))   :: sourceVersionGE(11)
 =>  java.nio.file.Files.newBufferedWriter(java.nio.file.Paths.get($s)) :: otherwise
 ;;
 
@@ -145,7 +145,7 @@ byte[] $buffer = new byte[$size];
 int $len;
 while (($len = $in.read($readargs$)) != -1) {
     $out.write($buffer, 0, $len);
-} :: sourceVersionGE(SourceVersion.RELEASE_9)
+} :: sourceVersionGE(9)
         && $in instanceof java.io.InputStream && $out instanceof java.io.OutputStream
         && matchesAny($readargs$, "$buffer", "$buffer, 0, $buffer.length")
 =>
@@ -163,7 +163,7 @@ int $len = $in.read($readargs$);
 while ($comp) {
     $out.write($buffer, 0, $len);
     $len = $read;
-} :: sourceVersionGE(SourceVersion.RELEASE_9)
+} :: sourceVersionGE(9)
         && $in instanceof java.io.InputStream && $out instanceof java.io.OutputStream
         && matchesAny($readargs$, "$buffer", "$buffer, 0, $buffer.length")
         && matchesAny($comp, "$len != -1", "$len >= 0", "$len > 0")
@@ -177,7 +177,7 @@ while (true) {
     int $len = $in.read($readargs$);
     if ($comp) break;
     $out.write($buffer, 0, $len);
-} :: sourceVersionGE(SourceVersion.RELEASE_9)
+} :: sourceVersionGE(9)
         && $in instanceof java.io.InputStream && $out instanceof java.io.OutputStream
         && matchesAny($readargs$, "$buffer", "$buffer, 0, $buffer.length")
         && matchesAny($comp, "$len == -1", "$len < 0", "$len <= 0")
@@ -188,12 +188,12 @@ $in.transferTo($out);
 // todo: check prev writes to bos
 "instream.readAllBytes() could be potentially used.":
 $in.transferTo($bos);
-$more$ $bytes = $bos.toByteArray(); :: $in instanceof java.io.InputStream && $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(SourceVersion.RELEASE_9) =>
+$more$ $bytes = $bos.toByteArray(); :: $in instanceof java.io.InputStream && $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(9) =>
 $more$ $bytes = $in.readAllBytes();
 ;;
 
 "instream.readAllBytes() could be potentially used.":
 $in.transferTo($bos);
-return $bos.toByteArray(); :: $in instanceof java.io.InputStream && $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(SourceVersion.RELEASE_9) =>
+return $bos.toByteArray(); :: $in instanceof java.io.InputStream && $bos instanceof java.io.ByteArrayOutputStream && sourceVersionGE(9) =>
 return $in.readAllBytes();
 ;;

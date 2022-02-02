@@ -15,29 +15,28 @@ import com.sun.tools.javac.tree.*;
 java.nio.charset.Charset.forName("UTF-8") =>
 java.nio.charset.StandardCharsets.UTF_8
 ;;
-/*
+
 // 18+
 try {
     $cs = java.nio.charset.Charset.forName($name);
 } catch ($Exception $ex) {
     $cs = $default;
-} :: $name instanceof String && $cs instanceof java.nio.charset.Charset && $default instanceof java.nio.charset.Charset && sourceVersionGE(SourceVersion.RELEASE_18)
+} :: $name instanceof String && $cs instanceof java.nio.charset.Charset && $default instanceof java.nio.charset.Charset && sourceVersionGE(18)
 =>
 $cs = java.nio.charset.Charset.forName($name, $default);
 ;;
-*/
 
 // todo: import StandardCharsets somehow to unblock this
 /*
-java.net.URLEncoder.encode($s, $charset_str) :: $charset_str instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_10) =>
+java.net.URLEncoder.encode($s, $charset_str) :: $charset_str instanceof java.lang.String && sourceVersionGE(10) =>
 java.net.URLEncoder.encode($s, $charset) :: string2Charset($str, $charset);;
 */
 
 // 10+ URLEncoder and URLDecoder
-java.net.URLEncoder.encode($s, "UTF-8") :: $s instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_10) =>
+java.net.URLEncoder.encode($s, "UTF-8") :: $s instanceof java.lang.String && sourceVersionGE(10) =>
 java.net.URLEncoder.encode($s, java.nio.charset.StandardCharsets.UTF_8);;
 
-java.net.URLDecoder.decode($s, "UTF-8") :: $s instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_10) =>
+java.net.URLDecoder.decode($s, "UTF-8") :: $s instanceof java.lang.String && sourceVersionGE(10) =>
 java.net.URLDecoder.decode($s, java.nio.charset.StandardCharsets.UTF_8);;
 
 // Strings
@@ -102,20 +101,20 @@ new java.util.Formatter($s, "UTF-8", $l) :: $s instanceof java.lang.String && $l
 new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8, $l);;
 
 // 10+ Scanner
-new java.util.Scanner($s, "UTF-8") :: $s instanceof java.io.File && sourceVersionGE(SourceVersion.RELEASE_10) =>
+new java.util.Scanner($s, "UTF-8") :: $s instanceof java.io.File && sourceVersionGE(10) =>
 new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
     
-new java.util.Scanner($s, "UTF-8") :: $s instanceof java.nio.file.Path && sourceVersionGE(SourceVersion.RELEASE_10) =>
+new java.util.Scanner($s, "UTF-8") :: $s instanceof java.nio.file.Path && sourceVersionGE(10) =>
 new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
 
-new java.util.Scanner($s, "UTF-8") :: $s instanceof java.io.InputStream && sourceVersionGE(SourceVersion.RELEASE_10) =>
+new java.util.Scanner($s, "UTF-8") :: $s instanceof java.io.InputStream && sourceVersionGE(10) =>
 new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
 
-new java.util.Scanner($s, "UTF-8") :: $s instanceof java.nio.channels.ReadableByteChannel && sourceVersionGE(SourceVersion.RELEASE_10) =>
+new java.util.Scanner($s, "UTF-8") :: $s instanceof java.nio.channels.ReadableByteChannel && sourceVersionGE(10) =>
 new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
 
 // 10+ Properties
-$p.storeToXML($os, $c, "UTF-8") :: $p instanceof java.util.Properties && $os instanceof java.io.OutputStream && $c instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_10) =>
+$p.storeToXML($os, $c, "UTF-8") :: $p instanceof java.util.Properties && $os instanceof java.io.OutputStream && $c instanceof java.lang.String && sourceVersionGE(10) =>
 $p.storeToXML($os, $c, java.nio.charset.StandardCharsets.UTF_8);;
 
 

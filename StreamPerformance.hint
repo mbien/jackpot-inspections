@@ -49,25 +49,25 @@ java.util.stream.Stream.empty()
 
 // 11
 "String::lines stream can be used.":
-$str.split("\n") :: $str instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_11) =>
+$str.split("\n") :: $str instanceof java.lang.String && sourceVersionGE(11) =>
 $str.lines().toArray(String[]::new)
 ;;
 
 "String::lines stream can be used.":
-$str.split("\\R") :: $str instanceof java.lang.String && sourceVersionGE(SourceVersion.RELEASE_11) =>
+$str.split("\\R") :: $str instanceof java.lang.String && sourceVersionGE(11) =>
 $str.lines().toArray(String[]::new)
 ;;
 
 // 9/16+
 "Stream::toList can be used.":
-java.util.List.of($stream.toArray($T[]::new)) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_9) =>
-$stream.toList(); :: sourceVersionGE(SourceVersion.RELEASE_16) =>
+java.util.List.of($stream.toArray($T[]::new)) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(9) =>
+$stream.toList(); :: sourceVersionGE(16) =>
 $stream.collect(java.util.stream.Collectors.toList()) :: otherwise
 ;;
 
 "Stream::toList can be used.":
-java.util.Arrays.asList($stream.toArray($T[]::new)) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_9) =>
-$stream.toList(); :: sourceVersionGE(SourceVersion.RELEASE_16) =>
+java.util.Arrays.asList($stream.toArray($T[]::new)) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(9) =>
+$stream.toList(); :: sourceVersionGE(16) =>
 $stream.collect(java.util.stream.Collectors.toList()) :: otherwise
 ;;
 
@@ -229,11 +229,11 @@ $stream.count()
 // simplify collectors
 // toList() shortcut 16+
 "could be potentially changed to stream.toList(), if unmodifiable.":
-$stream.collect(java.util.stream.Collectors.toList()) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_16) =>
+$stream.collect(java.util.stream.Collectors.toList()) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(16) =>
 $stream.toList()
 ;;
 
-$stream.collect(java.util.stream.Collectors.toUnmodifiableList()) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(SourceVersion.RELEASE_16) =>
+$stream.collect(java.util.stream.Collectors.toUnmodifiableList()) :: $stream instanceof java.util.stream.Stream && sourceVersionGE(16) =>
 $stream.toList()
 ;;
 

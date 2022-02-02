@@ -11,8 +11,7 @@ usage:
 
 requirements:
 
-* NetBeans 12.6 or later
-* NetBeans running on JDK 17 or later [^1]
+* NetBeans 13 or later
 * when used via CLI the JDK executing the task must be 17 or later [^1]
 
 <br/>
