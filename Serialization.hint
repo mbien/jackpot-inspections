@@ -1,0 +1,170 @@
+<?
+import java.lang.reflect.Method;
+import java.lang.reflect.Field;
+import com.sun.source.tree.*;
+import com.sun.source.util.*;
+import com.sun.source.tree.Tree.Kind;
+import com.sun.tools.javac.tree.*;
+import java.util.List;
+import javax.lang.model.util.*;
+?>
+
+<!description="Serialization hints.">
+
+// remove @Serial
+/*
+"Enclosing class is not Serializable.":
+$modifiers$ $type $name = $value; :: !inSerializableClass() && containsAnnotation($modifiers$, "java.io.Serial") =>
+"remove @Serial":
+$type $name = $value;
+;;
+
+"Enclosing class is not Serializable.":
+$modifiers$ <$typeParams$> $returnType $name($args$) throws $thrown$ {
+    $bodyStatements$;
+}
+:: !inSerializableClass() && containsAnnotation($modifiers$, "java.io.Serial") =>
+"remove @Serial":
+<$typeParams$> $returnType $name($args$) throws $thrown$ {
+    $bodyStatements$;
+}
+;;
+*/
+
+// add @Serial
+/*
+TODO:
+java.lang.ClassCastException: com.sun.tools.javac.tree.JCTree$JCModifiers cannot be cast to com.sun.source.tree.ExpressionTree
+	at org.netbeans.modules.java.source.transform.ImmutableTreeTranslator.rewriteChildren(ImmutableTreeTranslator.java:667)
+	at org.netbeans.modules.java.source.transform.ImmutableTreeTranslator.visitVariable(ImmutableTreeTranslator.java:351)
+	at org.netbeans.modules.java.source.transform.ImmutableTreeTranslator.visitVariable(ImmutableTreeTranslator.java:74)
+*/
+"serialVersionUID should be annotated with @Serial":
+$mods$ long serialVersionUID = $value; :: sourceVersionGE(14) && inSerializableClass() && !containsAnnotation($mods$, "java.io.Serial") /*=>
+"add @Serial":
+@java.io.Serial
+$mods$ long serialVersionUID = $value;*/
+;;
+
+"serialPersistentFields should be annotated with @Serial":
+$mods$ java.io.ObjectStreamField[] serialPersistentFields = $value; :: sourceVersionGE(14) && inSerializableClass() && !containsAnnotation($mods$, "java.io.Serial") /*=>
+"add @Serial":
+@java.io.Serial
+$mods$ java.io.ObjectStreamField[] serialPersistentFields = $value;*/
+;;
+
+"Method is part of the serialization mechanism and should be annotated with @Serial.":
+private void writeObject(java.io.ObjectOutputStream $stream) throws java.io.IOException {
+    $body$;
+}
+:: sourceVersionGE(14) && inSerializableClass() =>
+"add @Serial":
+@java.io.Serial
+private void writeObject(java.io.ObjectOutputStream $stream) throws java.io.IOException {
+    $body$;
+}
+;;
+
+"Method is part of the serialization mechanism and should be annotated with @Serial.":
+private void readObject(java.io.ObjectOutputStream $stream) throws java.io.IOException, ClassNotFoundException {
+    $body$;
+}
+:: sourceVersionGE(14) && inSerializableClass() =>
+"add @Serial":
+@java.io.Serial
+private void readObject(java.io.ObjectOutputStream $stream) throws java.io.IOException, ClassNotFoundException {
+    $body$;
+}
+;;
+
+"Method is part of the serialization mechanism and should be annotated with @Serial.":
+private void readObjectNoData() throws java.io.ObjectStreamException {
+    $body$;
+}
+:: sourceVersionGE(14) && inSerializableClass() =>
+"add @Serial":
+@java.io.Serial
+private void readObjectNoData() throws java.io.ObjectStreamException {
+    $body$;
+}
+;;
+
+"Method is part of the serialization mechanism and should be annotated with @Serial.":
+$mods$ Object writeReplace() throws java.io.ObjectStreamException {
+    $body$;
+}
+:: sourceVersionGE(14) && inSerializableClass() && !containsAnnotation($mods$, "java.io.Serial") /*=>
+"add @Serial":
+@java.io.Serial
+$mods$ Object writeReplace() throws java.io.ObjectStreamException {
+    $body$;
+}*/
+;;
+
+"Method is part of the serialization mechanism and should be annotated with @Serial.":
+$mods$ Object readResolve() throws java.io.ObjectStreamException {
+    $body$;
+}
+:: sourceVersionGE(14) && inSerializableClass() && !containsAnnotation($mods$, "java.io.Serial") /*=>
+"add @Serial":
+@java.io.Serial
+$mods$ Object readResolve() throws java.io.ObjectStreamException {
+    $body$;
+}*/
+;;
+
+<?
+    public boolean inSerializableClass() throws Throwable {
+
+        Variable parent = context.parent(context.variableForName("$_"));
+        if (parent == null) {
+            return false;
+        }
+        Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
+        m.setAccessible(true);
+        TreePath tp = (TreePath) m.invoke(context, parent);
+
+        Field f = context.getClass().getDeclaredField("ctx");
+        f.setAccessible(true);
+        Object ctx = f.get(context);
+
+        Object info = ctx.getClass().getDeclaredMethod("getInfo").invoke(ctx);
+        Trees trees = (Trees)info.getClass().getDeclaredMethod("getTrees").invoke(info);
+        Types types = (Types)info.getClass().getDeclaredMethod("getTypes").invoke(info);
+        Elements elements = (Elements)info.getClass().getDeclaredMethod("getElements").invoke(info);
+
+        javax.lang.model.type.TypeMirror tm = trees.getTypeMirror(tp);
+
+        return types.isAssignable(tm, elements.getTypeElement("java.io.Serializable").asType());
+    }
+
+    public boolean containsAnnotation(Variable mods, String annotation) throws Throwable {
+
+        Field f = context.getClass().getDeclaredField("ctx");
+        f.setAccessible(true);
+        Object ctx = f.get(context);
+
+        Object info = ctx.getClass().getDeclaredMethod("getInfo").invoke(ctx);
+        Trees trees = (Trees)info.getClass().getDeclaredMethod("getTrees").invoke(info);
+
+        Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
+        m.setAccessible(true);
+        TreePath tp = (TreePath) m.invoke(context, mods);
+
+        if (tp.getLeaf().getKind() == Kind.MODIFIERS) {
+            ModifiersTree mt = (ModifiersTree) tp.getLeaf();
+            List<? extends AnnotationTree> annotations = mt.getAnnotations();
+
+            for (AnnotationTree elem : annotations) {
+                TreePath p = trees.getPath(tp.getCompilationUnit(), elem);
+
+                if (trees.getTypeMirror(p).toString().equals(annotation)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+?>
