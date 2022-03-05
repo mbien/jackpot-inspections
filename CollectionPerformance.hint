@@ -94,6 +94,24 @@ new $Set<$T$>(java.util.List.of($a, $b, $more$)) :: $Set instanceof java.util.Se
 java.util.Set.of($a, $b, $more$)
 ;;
 
+// unmodifiable view -> immutable copy; 10+
+/*
+"unmodifiable view can be potentially replaced with immutable copy.":
+java.util.Collections.unmodifiableList($list) :: $list instanceof java.util.List && sourceVersionGE(10) =>
+java.util.List.copyOf($list);;
+
+"unmodifiable view can be potentially replaced with immutable copy.":
+java.util.Collections.unmodifiableCollection($col) :: $col instanceof java.util.Collection && sourceVersionGE(10) =>
+java.util.List.copyOf($col);;
+
+"unmodifiable view can be potentially replaced with immutable copy.":
+java.util.Collections.unmodifiableSet($set) :: $set instanceof java.util.Set && sourceVersionGE(10) =>
+java.util.Set.copyOf($set);;
+
+"unmodifiable view can be potentially replaced with immutable copy.":
+java.util.Collections.unmodifiableMap($map) :: $map instanceof java.util.Map && sourceVersionGE(10) =>
+java.util.Map.copyOf($map);;
+*/
 
 // prefer list.sort()
 // less readable
@@ -121,16 +139,19 @@ $more$ $map = new $Map($other);
 
 // avoid inefficient map traversal
 for ($K $k : $map.keySet()) {
+    $preamble$;
     $V $v = $map.get($k);
     $body$;
-} :: $map instanceof java.util.Map
+} :: $map instanceof java.util.Map && !referencedIn($k, $preamble$)
 =>
 for ($V $v : $map.values()) {
+    $preamble$;
     $body$;
 }
 :: !referencedIn($k, $body$)
 =>
 for (java.util.Map.Entry<$K, $V> entry : $map.entrySet()) {
+    $preamble$;
     $K $k = entry.getKey();
     $V $v = entry.getValue();
     $body$;
@@ -139,18 +160,22 @@ for (java.util.Map.Entry<$K, $V> entry : $map.entrySet()) {
 ;;
 
 // contains + get in succession
+"could be potentially replaced with a single get(key) if the map does not contain null values":
 if ($map.containsKey($key)) {
+    $preamble$;
     $V $v = $map.get($key);
     $body$;
-} :: $map instanceof java.util.Map
+} :: $map instanceof java.util.Map && !referencedIn($key, $preamble$)
 =>
 $V $v = $map.get($key);
 if ($v != null) {
+    $preamble$;
     $body$;
 }
 ;;
 
 // todo: figure out how to get val type
+"could be potentially replaced with a single get(key) if the map does not contain null values":
 if ($map.containsKey($key)) {
     return $map.get($key);
 } :: $map instanceof java.util.Map
@@ -171,12 +196,21 @@ $col.remove($v);
 
 if ($map.containsKey($k)) {
     $map.remove($k);
+    $rest$;
 } :: $map instanceof java.util.Map
 =>
 $map.remove($k);
+:: isEmpty($rest$)
+=>
+"could be potentially replaced with a single remove(key) if the map does not contain null values":
+if ($map.remove($k) == null) {
+    $rest$;
+}
+:: otherwise
 ;;
 
 // contains + put
+"could be potentially replaced with putIfAbsent(key, value) if the map does not contain null values":
 if (!$map.containsKey($k)) {
     $map.put($k, $v);
 } :: $map instanceof java.util.Map
@@ -184,6 +218,16 @@ if (!$map.containsKey($k)) {
 $map.putIfAbsent($k, $v);
 ;;
 
+// get instead contains (dangerous! values can be null)
+/*
+$map.get($k) == null :: $map instanceof java.util.Map =>
+!$map.containsKey($k)
+;;
+
+$map.get($k) != null :: $map instanceof java.util.Map =>
+$map.containsKey($k)
+;;
+*/
 
 // concise map population
 for ($O $o : $col) {
@@ -262,3 +306,12 @@ $MAP<java.net.URI, $V> $map = $init$;
 $map.put($key, $value) :: $map instanceof java.util.Map<java.net.URL, ?> && $key instanceof java.net.URL =>
 $map.put($key.toURI(), $value)
 ;;
+
+
+<?
+    public boolean isEmpty(Variable var) throws Throwable {
+        return !context.getIndexedVariables(var).iterator().hasNext();
+    }
+
+?>
+
