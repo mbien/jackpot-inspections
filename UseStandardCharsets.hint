@@ -1,150 +1,164 @@
 <?
+import org.netbeans.modules.java.hints.declarative.APIAccessor;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.Charset;
-
+import java.util.HashSet;
+import java.util.Set;
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import com.sun.source.tree.*;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.*;
 ?>
 
-<!description="Use StandardCharset constants instead of String lookup and other improvements to Charsets.">
+<!description="Use StandardCharset constants instead of String lookup and other improvements to Charset handling code.">
 
+// TODO: string2Charset() doesn't add imports
 
-java.nio.charset.Charset.forName("UTF-8") =>
-java.nio.charset.StandardCharsets.UTF_8
-;;
+/*
+Charset.forName($charset_str) :: $charset_str instanceof String && isCharsetString($charset_str) =>
+$charset :: string2Charset($charset_str, $charset);;
+*/
+
+Charset.forName("UTF-8")      => StandardCharsets.UTF_8;;
+Charset.forName("UTF-16")     => StandardCharsets.UTF_16;;
+Charset.forName("UTF-16BE")   => StandardCharsets.UTF_16BE;;
+Charset.forName("UTF-16LE")   => StandardCharsets.UTF_16LE;;
+Charset.forName("ISO-8859-1") => StandardCharsets.ISO_8859_1;;
+Charset.forName("US-ASCII")   => StandardCharsets.US_ASCII;;
 
 // 18+
 try {
-    $cs = java.nio.charset.Charset.forName($name);
+    $cs = Charset.forName($name);
 } catch ($Exception $ex) {
     $cs = $default;
-} :: $name instanceof String && $cs instanceof java.nio.charset.Charset && $default instanceof java.nio.charset.Charset && sourceVersionGE(18)
+} :: $name instanceof String && $cs instanceof Charset && $default instanceof Charset && sourceVersionGE(18)
 =>
-$cs = java.nio.charset.Charset.forName($name, $default);
+$cs = Charset.forName($name, $default);
 ;;
 
-// todo: import StandardCharsets somehow to unblock this
-/*
-java.net.URLEncoder.encode($s, $charset_str) :: $charset_str instanceof java.lang.String && sourceVersionGE(10) =>
-java.net.URLEncoder.encode($s, $charset) :: string2Charset($str, $charset);;
-*/
-
 // 10+ URLEncoder and URLDecoder
-java.net.URLEncoder.encode($s, "UTF-8") :: $s instanceof java.lang.String && sourceVersionGE(10) =>
-java.net.URLEncoder.encode($s, java.nio.charset.StandardCharsets.UTF_8);;
+java.net.URLEncoder.encode($s, $charset_str) :: $s instanceof String && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+java.net.URLEncoder.encode($s, $charset) :: string2Charset($charset_str, $charset);;
 
-java.net.URLDecoder.decode($s, "UTF-8") :: $s instanceof java.lang.String && sourceVersionGE(10) =>
-java.net.URLDecoder.decode($s, java.nio.charset.StandardCharsets.UTF_8);;
+java.net.URLDecoder.decode($s, $charset_str) :: $s instanceof String && $charset_str instanceof String && sourceVersionGE(10) =>
+java.net.URLDecoder.decode($s, $charset) :: string2Charset($charset_str, $charset);;
 
 // Strings
-$s.getBytes("UTF-8") :: $s instanceof java.lang.String =>
-$s.getBytes(java.nio.charset.StandardCharsets.UTF_8);;
+$s.getBytes($charset_str) :: $s instanceof String && $charset_str instanceof String && isCharsetString($charset_str) =>
+$s.getBytes($charset) :: string2Charset($charset_str, $charset);;
 
-new java.lang.String($b, "UTF-8") :: $b instanceof byte[] => 
-new java.lang.String($b, java.nio.charset.StandardCharsets.UTF_8);;
+new String($b, $charset_str) :: $b instanceof byte[] && $charset_str instanceof String && isCharsetString($charset_str) => 
+new String($b, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.lang.String($b, $o, $l, "UTF-8") :: $b instanceof byte[] && $o instanceof int && $l instanceof int => 
-new java.lang.String($b, $o, $l, java.nio.charset.StandardCharsets.UTF_8);;
+new String($b, $o, $l, $charset_str) :: $b instanceof byte[] && $o instanceof int && $l instanceof int && $charset_str instanceof String && isCharsetString($charset_str) => 
+new String($b, $o, $l, $charset) :: string2Charset($charset_str, $charset);;
 
 // IO Streams
-new java.io.InputStreamReader($s, "UTF-8") :: $s instanceof java.io.InputStream =>
-new java.io.InputStreamReader($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.io.InputStreamReader($s, $charset_str) :: $s instanceof java.io.InputStream && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.io.InputStreamReader($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.io.OutputStreamWriter($s, "UTF-8") :: $s instanceof java.io.OutputStream =>
-new java.io.OutputStreamWriter($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.io.OutputStreamWriter($s, $charset_str) :: $s instanceof java.io.OutputStream && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.io.OutputStreamWriter($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.io.PrintStream($s, "UTF-8") :: $s instanceof java.lang.String =>
-new java.io.PrintStream($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.io.PrintStream($s, $charset_str) :: $s instanceof String && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.io.PrintStream($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.io.PrintStream($f, "UTF-8") :: $f instanceof java.io.File =>
-new java.io.PrintStream($f, java.nio.charset.StandardCharsets.UTF_8);;
+new java.io.PrintStream($f, $charset_str) :: $f instanceof java.io.File && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.io.PrintStream($f, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.io.PrintStream($o, $b, "UTF-8") :: $o instanceof java.io.OutputStream && $b instanceof boolean =>
-new java.io.PrintStream($o, $b, java.nio.charset.StandardCharsets.UTF_8);;
+new java.io.PrintStream($o, $b, $charset_str) :: $o instanceof java.io.OutputStream && $b instanceof boolean && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.io.PrintStream($o, $b, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.io.PrintWriter($s, "UTF-8") :: $s instanceof java.lang.String =>
-new java.io.PrintWriter($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.io.PrintWriter($s, $charset_str) :: $s instanceof String && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+new java.io.PrintWriter($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.io.PrintWriter($f, "UTF-8") :: $f instanceof java.io.File =>
-new java.io.PrintWriter($f, java.nio.charset.StandardCharsets.UTF_8);;
+new java.io.PrintWriter($f, $charset_str) :: $f instanceof java.io.File && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+new java.io.PrintWriter($f, $charset) :: string2Charset($charset_str, $charset);;
 
-$bos.toString("UTF-8") :: $bos instanceof java.io.ByteArrayOutputStream =>
-$bos.toString(java.nio.charset.StandardCharsets.UTF_8);;
+$bos.toString($charset_str) :: $bos instanceof java.io.ByteArrayOutputStream && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+$bos.toString($charset) :: string2Charset($charset_str, $charset);;
 
 // Channels
-java.nio.channels.Channels.newReader($ch, "UTF-8") :: $ch instanceof java.nio.channels.ReadableByteChannel =>
-java.nio.channels.Channels.newReader($ch, java.nio.charset.StandardCharsets.UTF_8);;
+java.nio.channels.Channels.newReader($ch, $charset_str) :: $ch instanceof java.nio.channels.ReadableByteChannel && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+java.nio.channels.Channels.newReader($ch, $charset) :: string2Charset($charset_str, $charset);;
 
-java.nio.channels.Channels.newWriter($ch, "UTF-8") :: $ch instanceof java.nio.channels.WritableByteChannel =>
-java.nio.channels.Channels.newWriter($ch, java.nio.charset.StandardCharsets.UTF_8);;
+java.nio.channels.Channels.newWriter($ch, $charset_str) :: $ch instanceof java.nio.channels.WritableByteChannel && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+java.nio.channels.Channels.newWriter($ch, $charset) :: string2Charset($charset_str, $charset);;
 
 // Formatters
-new java.util.Formatter($s, "UTF-8") :: $s instanceof java.io.File =>
-new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.util.Formatter($s, $charset_str) :: $s instanceof java.io.File && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.util.Formatter($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.util.Formatter($s, "UTF-8", $l) :: $s instanceof java.io.File && $l instanceof java.util.Locale =>
-new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8, $l);;
+new java.util.Formatter($s, $charset_str, $l) :: $s instanceof java.io.File && $l instanceof java.util.Locale && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.util.Formatter($s, $charset, $l) :: string2Charset($charset_str, $charset);;
 
-new java.util.Formatter($s, "UTF-8") :: $s instanceof java.io.OutputStream =>
-new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.util.Formatter($s, $charset_str) :: $s instanceof java.io.OutputStream && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.util.Formatter($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.util.Formatter($s, "UTF-8", $l) :: $s instanceof java.io.OutputStream && $l instanceof java.util.Locale =>
-new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8, $l);;
+new java.util.Formatter($s, $charset_str, $l) :: $s instanceof java.io.OutputStream && $l instanceof java.util.Locale && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.util.Formatter($s, $charset, $l) :: string2Charset($charset_str, $charset);;
     
-new java.util.Formatter($s, "UTF-8") :: $s instanceof java.lang.String =>
-new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.util.Formatter($s, $charset_str) :: $s instanceof String && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.util.Formatter($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.util.Formatter($s, "UTF-8", $l) :: $s instanceof java.lang.String && $l instanceof java.util.Locale =>
-new java.util.Formatter($s, java.nio.charset.StandardCharsets.UTF_8, $l);;
+new java.util.Formatter($s, $charset_str, $l) :: $s instanceof String && $l instanceof java.util.Locale && $charset_str instanceof String && isCharsetString($charset_str) =>
+new java.util.Formatter($s, $charset, $l) :: string2Charset($charset_str, $charset);;
 
 // 10+ Scanner
-new java.util.Scanner($s, "UTF-8") :: $s instanceof java.io.File && sourceVersionGE(10) =>
-new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.util.Scanner($s, $charset_str) :: $s instanceof java.io.File && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+new java.util.Scanner($s, $charset) :: string2Charset($charset_str, $charset);;
     
-new java.util.Scanner($s, "UTF-8") :: $s instanceof java.nio.file.Path && sourceVersionGE(10) =>
-new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.util.Scanner($s, $charset_str) :: $s instanceof java.nio.file.Path && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+new java.util.Scanner($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.util.Scanner($s, "UTF-8") :: $s instanceof java.io.InputStream && sourceVersionGE(10) =>
-new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.util.Scanner($s, $charset_str) :: $s instanceof java.io.InputStream && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+new java.util.Scanner($s, $charset) :: string2Charset($charset_str, $charset);;
 
-new java.util.Scanner($s, "UTF-8") :: $s instanceof java.nio.channels.ReadableByteChannel && sourceVersionGE(10) =>
-new java.util.Scanner($s, java.nio.charset.StandardCharsets.UTF_8);;
+new java.util.Scanner($s, $charset_str) :: $s instanceof java.nio.channels.ReadableByteChannel && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+new java.util.Scanner($s, $charset) :: string2Charset($charset_str, $charset);;
 
 // 10+ Properties
-$p.storeToXML($os, $c, "UTF-8") :: $p instanceof java.util.Properties && $os instanceof java.io.OutputStream && $c instanceof java.lang.String && sourceVersionGE(10) =>
-$p.storeToXML($os, $c, java.nio.charset.StandardCharsets.UTF_8);;
+$p.storeToXML($os, $c, $charset_str) :: $p instanceof java.util.Properties && $os instanceof java.io.OutputStream && $c instanceof String && $charset_str instanceof String && isCharsetString($charset_str) && sourceVersionGE(10) =>
+$p.storeToXML($os, $c, $charset) :: string2Charset($charset_str, $charset);;
 
 
 // internal API
 sun.nio.cs.ThreadLocalCoders.encoderFor("UTF-8") =>
-java.nio.charset.StandardCharsets.UTF_8.newEncoder()
+StandardCharsets.UTF_8.newEncoder()
 ;;
 
 sun.nio.cs.ThreadLocalCoders.decoderFor("UTF-8") =>
-java.nio.charset.StandardCharsets.UTF_8.newDecoder()
+StandardCharsets.UTF_8.newDecoder()
 ;;
 
 
 <?
-public boolean string2Charset(Variable str, Variable target) throws Throwable {
-    
-    String string = getStringLiteral(str);
-    String value = "java.nio.charset.StandardCharsets." + string.replace('-', '_');
-
-    context.createRenamed(str, target, value);
-    return true;
-}
-private String getStringLiteral(Variable str) throws Throwable {
-    
-    Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
-    m.setAccessible(true);
-    TreePath tp = (TreePath) m.invoke(context, str);
-    if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
-        return (String) ((LiteralTree) tp.getLeaf()).getValue();
+    private final static Set<String> standardCharsetNames;
+    static {
+        Field[] constants = StandardCharsets.class.getDeclaredFields();
+        standardCharsetNames = new HashSet<>(constants.length);
+        for (Field field : constants) {
+            standardCharsetNames.add(field.getName().replace('_', '-'));
+        }
     }
-    return null;
-}
+    private boolean isCharsetString(Variable str) throws Throwable {
+        return standardCharsetNames.contains(getStringLiteral(str));
+    }
+    public boolean string2Charset(Variable str, Variable charset) throws Throwable {
+        String string = getStringLiteral(str);
+        if (string == null) {
+            return false;
+        }
+        context.createRenamed(str, charset, "StandardCharsets."+string.replace('-', '_'));
+        return true;
+    }
+    private String getStringLiteral(Variable str) throws Throwable {
+        TreePath tp = APIAccessor.IMPL.getSingleVariable(context, str);
+        if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
+            return (String) ((LiteralTree) tp.getLeaf()).getValue();
+        }
+        return null;
+    }
 ?>
