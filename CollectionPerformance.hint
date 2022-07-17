@@ -218,6 +218,19 @@ if (!$map.containsKey($k)) {
 $map.putIfAbsent($k, $v);
 ;;
 
+// add to sub-collection
+"could be replaced with putIfAbsent(key, new SubCollection()).add(toAdd)":
+$Col $subcol = $map.get($key);
+if ($subcol == null) {
+    $subcol = $subColInit;
+    $map.put($key, $subcol);
+}
+$subcol.add($item);
+:: $map instanceof java.util.Map && $subcol instanceof java.util.Collection
+=>
+$map.putIfAbsent($key, $subColInit).add($item);
+;;
+
 // get instead contains (dangerous! values can be null)
 /*
 $map.get($k) == null :: $map instanceof java.util.Map =>
