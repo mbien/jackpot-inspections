@@ -154,6 +154,16 @@ $rt.exec($cmd, $env) :: $rt instanceof java.lang.Runtime && $cmd instanceof Stri
 $rt.exec($cmd, $env, $file) :: $rt instanceof java.lang.Runtime && $cmd instanceof String && $env instanceof String[] && $file instanceof java.io.File;;
 
 
+// 19+
+$thread.getId() :: $thread instanceof java.lang.Thread && sourceVersionGE(19) =>
+$thread.threadId()
+;;
+
+new java.util.Locale($args$) :: sourceVersionGE(19) =>
+java.util.Locale.of($args$)
+;;
+
+
 <?
 public boolean flag2Enum(Variable str, Variable target) throws Throwable {
     
