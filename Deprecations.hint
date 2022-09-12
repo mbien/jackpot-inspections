@@ -180,14 +180,15 @@ private RoundingMode getMatchingEnum(Variable str) throws Throwable {
     m.setAccessible(true);
     TreePath tp = (TreePath) m.invoke(context, str);
 
-    if (tp.getLeaf().getKind() == Kind.INT_LITERAL) {
+    Tree.Kind kind = tp.getLeaf().getKind();
+    if (kind == Kind.INT_LITERAL) {
         try {
             return RoundingMode.valueOf(Integer.parseInt(tp.getLeaf().toString()));
         } catch (NumberFormatException ex) {
             return null;
         }
-    } else if (tp.getLeaf() instanceof JCTree.JCExpression) { // TODO there is probably a way how to get values of constants
-        String exp = ((JCTree.JCExpression)tp.getLeaf()).toString();
+    } else if (kind == Kind.MEMBER_SELECT || kind == Kind.IDENTIFIER) { // TODO there is probably a way how to get values of constants
+        String exp = tp.getLeaf().toString();
 
         int dot = exp.lastIndexOf('.');
         if (dot != -1) {
