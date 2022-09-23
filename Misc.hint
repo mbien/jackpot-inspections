@@ -109,18 +109,17 @@ System.getProperty("path.separator") =>
 java.io.File.pathSeparator
 ;;
 
-// 9+
 System.getProperty("java.runtime.version") :: sourceVersionGE(9) =>
 Runtime.version().toString()
 ;;
 
-// 10+
 System.getProperty("java.specification.version") :: sourceVersionGE(10) =>
 Runtime.version().feature()
 ;;
 
-System.getProperty("java.version") :: sourceVersionGE(10) =>
-Runtime.version().feature()
+// no exact match unfortunately since it contains optional values
+System.getProperty("java.version") :: sourceVersionGE(9) =>
+Runtime.version().toString()
 ;;
 
 "URL.equals() resolves the host and compares the target, this is a blocking operation. Consider comparing URIs or Strings instead.":
