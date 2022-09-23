@@ -321,6 +321,83 @@ $map.put($key.toURI(), $value)
 ;;
 
 
+// 19+ Map/Set factory methods
+"Factory method for creating pre-sized Maps with provided number of entries can be used.":
+new java.util.HashMap<$T$>($cap) :: $cap instanceof int && sourceVersionGE(19)
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75)")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75f)")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "(int) ($n / 0.75) + 1")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "(int) ($n / 0.75f) + 1")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "($n * 4 + 2) / 3")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "(4 * $n + 2) / 3")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "($n * 4) / 3 + 1")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "(4 * $n) / 3 + 1")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "(int) (($n * 4L + 2L) / 3L)")
+=> java.util.HashMap.newHashMap($n) :: matchesWithBind($cap, "(int) ((4L * $n + 2L) / 3L)")
+=> java.util.HashMap.newHashMap($cap) :: otherwise
+;;
+
+"Factory method for creating pre-sized Maps with provided number of entries can be used.":
+new java.util.LinkedHashMap<$T$>($cap) :: $cap instanceof int && sourceVersionGE(19)
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75)")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75f)")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "(int) ($n / 0.75) + 1")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "(int) ($n / 0.75f) + 1")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "($n * 4 + 2) / 3")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "(4 * $n + 2) / 3")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "($n * 4) / 3 + 1")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "(4 * $n) / 3 + 1")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "(int) (($n * 4L + 2L) / 3L)")
+=> java.util.LinkedHashMap.newLinkedHashMap($n) :: matchesWithBind($cap, "(int) ((4L * $n + 2L) / 3L)")
+=> java.util.LinkedHashMap.newLinkedHashMap($cap) :: otherwise
+;;
+
+"Factory method for creating pre-sized Maps with provided number of entries can be used.":
+new java.util.WeakHashMap<$T$>($cap) :: $cap instanceof int && sourceVersionGE(19)
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75)")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75f)")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "(int) ($n / 0.75) + 1")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "(int) ($n / 0.75f) + 1")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "($n * 4 + 2) / 3")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "(4 * $n + 2) / 3")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "($n * 4) / 3 + 1")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "(4 * $n) / 3 + 1")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "(int) (($n * 4L + 2L) / 3L)")
+=> java.util.WeakHashMap.newWeakHashMap($n) :: matchesWithBind($cap, "(int) ((4L * $n + 2L) / 3L)")
+=> java.util.WeakHashMap.newWeakHashMap($cap) :: otherwise
+;;
+
+"Factory method for creating pre-sized Sets with provided number of entries can be used.":
+new java.util.HashSet<$T$>($cap) :: $cap instanceof int && sourceVersionGE(19)
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75)")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75f)")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "(int) ($n / 0.75) + 1")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "(int) ($n / 0.75f) + 1")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "($n * 4 + 2) / 3")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "(4 * $n + 2) / 3")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "($n * 4) / 3 + 1")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "(4 * $n) / 3 + 1")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "(int) (($n * 4L + 2L) / 3L)")
+=> java.util.HashSet.newHashSet($n) :: matchesWithBind($cap, "(int) ((4L * $n + 2L) / 3L)")
+=> java.util.HashSet.newHashSet($cap) :: otherwise
+;;
+
+"Factory method for creating pre-sized Sets with provided number of entries can be used.":
+new java.util.LinkedHashSet<$T$>($cap) :: $cap instanceof int && sourceVersionGE(19)
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75)")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "(int) Math.ceil($n / 0.75f)")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "(int) ($n / 0.75) + 1")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "(int) ($n / 0.75f) + 1")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "($n * 4 + 2) / 3")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "(4 * $n + 2) / 3")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "($n * 4) / 3 + 1")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "(4 * $n) / 3 + 1")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "(int) (($n * 4L + 2L) / 3L)")
+=> java.util.LinkedHashSet.newLinkedHashSet($n) :: matchesWithBind($cap, "(int) ((4L * $n + 2L) / 3L)")
+=> java.util.LinkedHashSet.newLinkedHashSet($cap) :: otherwise
+;;
+
+
 <?
     public boolean isEmpty(Variable var) throws Throwable {
         return !context.getIndexedVariables(var).iterator().hasNext();
