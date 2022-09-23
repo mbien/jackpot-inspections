@@ -139,6 +139,32 @@ java.nio.file.Files.copy($s1.toPath(), $s2.toPath(), java.nio.file.StandardCopyO
 ;;
 
 
+"Files.exists() can be used.":
+new java.io.File($parent, $child$).exists() :: $parent instanceof String
+=> java.nio.file.Files.exists(java.nio.file.Path.of($parent, $child$))   :: sourceVersionGE(11)
+=> java.nio.file.Files.exists(java.nio.file.Paths.get($parent, $child$)) :: otherwise
+;;
+
+"Files.exists() can be used.":
+new java.io.File($parent, $child).exists() :: $parent instanceof java.io.File
+=> java.nio.file.Files.exists($parent.toPath().resolve($child))
+;;
+
+"Files.exists() can be used.":
+new java.io.File($uri).exists() :: $uri instanceof java.net.URI
+=> java.nio.file.Files.exists(java.nio.file.Path.of($uri))   :: sourceVersionGE(11)
+=> java.nio.file.Files.exists(java.nio.file.Paths.get($uri)) :: otherwise
+;;
+
+"Files.notExists() can be used.":
+!java.nio.file.Files.exists($path, $options$) =>
+ java.nio.file.Files.notExists($path, $options$);;
+
+"Files.notExists() can be used.":
+java.nio.file.Files.exists($path, $options$) == false =>
+java.nio.file.Files.notExists($path, $options$);;
+
+
 // use transferTo
 "instream.transferTo(outstream) can be used.":
 byte[] $buffer = new byte[$size];
