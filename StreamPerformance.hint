@@ -154,15 +154,15 @@ $stream.noneMatch($lambda)
  $stream.anyMatch($lambda)
 ;;
 
-// stream.sorted(comparator).findFirst() -> Stream.min(comparator)
-$stream.sorted($comp).findFirst() :: $stream instanceof java.util.stream.Stream =>
+"use min() instead of sorted().findFirst()":
+$stream.sorted($comp).findFirst() :: $stream instanceof java.util.stream.Stream && $comp instanceof java.util.Comparator =>
 $stream.min($comp)
 ;;
 
-// makes it worse
-//$stream.sorted().findFirst() :: $stream instanceof java.util.stream.Stream =>
-//$stream.min(java.util.Comparator.naturalOrder())
-//;;
+"use min() instead of sorted().findFirst()":
+$stream.sorted().findFirst() :: $stream instanceof java.util.stream.Stream =>
+$stream.min(java.util.Comparator.naturalOrder())
+;;
 
 // min -> max + invert order
 $stream.min(java.util.Comparator.reverseOrder()) :: $stream instanceof java.util.stream.Stream =>
@@ -174,9 +174,70 @@ $stream.max(java.util.Comparator.reverseOrder()) :: $stream instanceof java.util
 $stream.min(java.util.Comparator.naturalOrder())
 ;;
 
+// step order
+"move sorted() before distinct()":
+$stream.distinct().sorted($comp$) :: $stream instanceof java.util.stream.Stream =>
+$stream.sorted($comp$).distinct()
+;;
+
+"move filter() before distinct()":
+$stream.distinct().filter($filter) :: $stream instanceof java.util.stream.Stream =>
+$stream.filter($filter).distinct()
+;;
+
+"move filter() before sorted()":
+$stream.sorted($comp$).filter($filter) :: $stream instanceof java.util.stream.Stream =>
+$stream.filter($filter).sorted($comp$)
+;;
+
+// redundant steps
+"remove redundant sorted() step before findAny()":
+$stream.sorted($comp$).findAny() :: $stream instanceof java.util.stream.Stream =>
+$stream.findAny()
+;;
+
+"remove redundant distinct() step before findAny()":
+$stream.distinct().findAny() :: $stream instanceof java.util.stream.Stream =>
+$stream.findAny()
+;;
+
+"remove redundant distinct() step before findFirst()":
+$stream.distinct().findFirst() :: $stream instanceof java.util.stream.Stream =>
+$stream.findFirst()
+;;
+
+"remove redundant sorted() step before anyMatch()":
+$stream.sorted($comp$).anyMatch($pred) :: $stream instanceof java.util.stream.Stream =>
+$stream.anyMatch($pred)
+;;
+
+"remove redundant distinct() step before anyMatch()":
+$stream.distinct().anyMatch($pred)) :: $stream instanceof java.util.stream.Stream =>
+$stream.anyMatch($pred))
+;;
+
+"remove redundant sorted() step before noneMatch()":
+$stream.sorted($comp$).noneMatch($pred) :: $stream instanceof java.util.stream.Stream =>
+$stream.noneMatch($pred)
+;;
+
+"remove redundant distinct() step before noneMatch()":
+$stream.distinct().noneMatch($pred) :: $stream instanceof java.util.stream.Stream =>
+$stream.noneMatch($pred)
+;;
+
+"remove redundant sorted() step before allMatch()":
+$stream.sorted($comp$).allMatch($pred) :: $stream instanceof java.util.stream.Stream =>
+$stream.allMatch($pred)
+;;
+
+"remove redundant distinct() step before allMatch()":
+$stream.distinct().allMatch($pred) :: $stream instanceof java.util.stream.Stream =>
+$stream.allMatch($pred)
+;;
 
 // collection.stream().forEach() -> collection.forEach()
-"redundant stream() before forEach().":
+"remove redundant stream() before forEach().":
 $col.stream().forEach($con) :: $col instanceof java.util.Collection && $con instanceof java.util.function.Consumer =>
 $col.forEach($con)
 ;;
