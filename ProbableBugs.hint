@@ -39,6 +39,8 @@ java.nio.file.Files.list($1$) :: !isInTryWithResourceBlock();;
 "Streams returned from Files.walk() must be closed. Statement should be in a try-with-resource block.":
 java.nio.file.Files.walk($1$) :: !isInTryWithResourceBlock();;
 
+"Streams returned from Files.find() must be closed. Statement should be in a try-with-resource block.":
+java.nio.file.Files.find($1$) :: !isInTryWithResourceBlock();;
 
 <?
 public boolean isInTryWithResourceBlock() throws Throwable {
