@@ -61,6 +61,7 @@ java.util.Collections.emptyList();;
 // prefer immutable collection for small arrays
 // not recommended for large arrays in inner loops due to the null check
 // todo: add check for $a not being an array + remove $b
+"List.of is more compact for small lists.":
 java.util.Arrays.asList($a, $b, $more$) :: !parentMatches("java.util.Collections.unmodifiableList($_)") && sourceVersionGE(9) =>
 java.util.List.of($a, $b, $more$);;
 
@@ -89,6 +90,9 @@ java.util.Set.of($a$);;
 
 java.util.Collections.unmodifiableSet(new $Set<$T$>(java.util.List.of($a$))) :: $Set instanceof java.util.Set && sourceVersionGE(9) =>
 java.util.Set.of($a$);;
+
+java.util.Collections.newSetFromMap(new java.util.LinkedHashMap<$kv$>()) =>
+new java.util.LinkedHashSet<>();;
 
 // todo: needs read only check
 "could be potentially replaced with Set.of(..) - if immutable.":
@@ -193,6 +197,14 @@ if (val != null) {
 }
 ;;
 
+// get + remove in succession
+if ($map.get($k) == $v) {
+    $map.remove($k);
+} :: $map instanceof java.util.Map
+=>
+$map.remove($k, $v);
+;;
+
 // contains + remove in succession
 if ($col.contains($v)) {
     $col.remove($v);
@@ -232,10 +244,12 @@ if ($subcol == null) {
     $subcol = $subColInit;
     $map.put($key, $subcol);
 }
-$subcol.add($item);
-:: $map instanceof java.util.Map && $subcol instanceof java.util.Collection
+$statement;                                     :: $map instanceof java.util.Map && $subcol instanceof java.util.Collection
 =>
-$map.putIfAbsent($key, $subColInit).add($item);
+$map.putIfAbsent($key, $subColInit).add($item); :: matchesWithBind($statement, "$subcol.add($item);")
+=>
+$Col $subcol = $map.putIfAbsent($key, $subColInit);
+$statement;                                     :: otherwise
 ;;
 
 // get instead contains (dangerous! values can be null)
