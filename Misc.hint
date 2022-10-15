@@ -122,8 +122,24 @@ System.getProperty("java.version") :: sourceVersionGE(9) =>
 Runtime.version().toString()
 ;;
 
+System.getProperty("java.class.version") :: sourceVersionGE(20) =>
+java.lang.reflect.ClassFileFormatVersion.latest().major()
+;;
+
+
 "URL.equals() resolves the host and compares the target, this is a blocking operation. Consider comparing URIs or Strings instead.":
 $url1.equals($url2) :: $url1 instanceof java.net.URL && $url2 instanceof java.net.URL;;
+
+
+java.util.StringJoiner $joiner = new java.util.StringJoiner($delim);
+for (String $s : $iter) {
+    $joiner.add($s);
+}
+String $joined = $joiner.toString();
+=>
+String $joined = String.join($delim, $iter);
+;;
+
 
 /* todo: should be a hint but no warning
 
