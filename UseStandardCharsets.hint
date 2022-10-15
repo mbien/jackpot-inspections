@@ -138,7 +138,7 @@ StandardCharsets.UTF_8.newDecoder()
     private final static Set<String> standardCharsetNames;
     static {
         Field[] constants = StandardCharsets.class.getDeclaredFields();
-        standardCharsetNames = new HashSet<>(constants.length);
+        standardCharsetNames = new HashSet<>((int) Math.ceil(constants.length / 0.75));
         for (Field field : constants) {
             standardCharsetNames.add(field.getName().replace('_', '-'));
         }
@@ -156,8 +156,20 @@ StandardCharsets.UTF_8.newDecoder()
     }
     private String getStringLiteral(Variable str) throws Throwable {
         TreePath tp = APIAccessor.IMPL.getSingleVariable(context, str);
-        if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
+        if (tp == null) {
+            return null;
+        }
+        if (tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
             return (String) ((LiteralTree) tp.getLeaf()).getValue();
+        } else if (tp.getLeaf().getKind() == Kind.METHOD_INVOCATION) {
+            String charset = tp.iterator().next().toString();
+            if (charset.endsWith(".name()")) {
+                charset = charset.substring(0, charset.length()-7);
+                if (charset.contains(".")) {
+                    charset = charset.substring(charset.lastIndexOf(".")+1, charset.length());
+                }
+                return charset.replace('_', '-');
+            }
         }
         return null;
     }
