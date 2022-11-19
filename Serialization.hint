@@ -1,4 +1,5 @@
 <?
+import org.netbeans.modules.java.hints.declarative.APIAccessor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Field;
 import com.sun.source.tree.*;
@@ -147,9 +148,7 @@ $mods$ Object readResolve() throws java.io.ObjectStreamException {
         Object info = ctx.getClass().getDeclaredMethod("getInfo").invoke(ctx);
         Trees trees = (Trees)info.getClass().getDeclaredMethod("getTrees").invoke(info);
 
-        Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
-        m.setAccessible(true);
-        TreePath tp = (TreePath) m.invoke(context, mods);
+        TreePath tp = APIAccessor.IMPL.getSingleVariable(context, mods);
 
         if (tp.getLeaf().getKind() == Kind.MODIFIERS) {
             ModifiersTree mt = (ModifiersTree) tp.getLeaf();

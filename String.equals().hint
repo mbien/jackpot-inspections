@@ -1,7 +1,7 @@
 
 <?
+import org.netbeans.modules.java.hints.declarative.APIAccessor;
 import javax.lang.model.element.ElementKind;
-import java.lang.reflect.Method;
 import com.sun.source.util.TreePath;
 import com.sun.source.tree.Tree.Kind;
 ?>
@@ -48,9 +48,7 @@ private boolean isStringLiteral(Variable str) throws Throwable {
     if (ElementKind.FIELD.equals(context.elementKind(str))) { // todo
         return true;
     }
-    Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
-    m.setAccessible(true);
-    TreePath tp = (TreePath) m.invoke(context, str);
+    TreePath tp = APIAccessor.IMPL.getSingleVariable(context, str);
     if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
         return true;
     }

@@ -1,5 +1,5 @@
 <?
-import java.lang.reflect.Method;
+import org.netbeans.modules.java.hints.declarative.APIAccessor;
 import java.math.RoundingMode;
 
 import com.sun.source.tree.*;
@@ -176,9 +176,7 @@ public boolean flag2Enum(Variable str, Variable target) throws Throwable {
 }
 private RoundingMode getMatchingEnum(Variable str) throws Throwable {
 
-    Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
-    m.setAccessible(true);
-    TreePath tp = (TreePath) m.invoke(context, str);
+    TreePath tp = APIAccessor.IMPL.getSingleVariable(context, str);
 
     Tree.Kind kind = tp.getLeaf().getKind();
     if (kind == Kind.INT_LITERAL) {

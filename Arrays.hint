@@ -1,5 +1,5 @@
 <?
-import java.lang.reflect.Method;
+import org.netbeans.modules.java.hints.declarative.APIAccessor;
 import com.sun.source.util.*;
 import com.sun.source.tree.Tree.Kind;
 import javax.lang.model.util.*;
@@ -65,9 +65,7 @@ return java.util.Arrays.equals($array1, $array2);
 
     public boolean isLiteral(Variable var) throws Throwable {
 
-        Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
-        m.setAccessible(true);
-        TreePath tp = (TreePath) m.invoke(context, var);
+        TreePath tp = APIAccessor.IMPL.getSingleVariable(context, var);
 
         switch (tp.getLeaf().getKind()) {
             case INT_LITERAL:
