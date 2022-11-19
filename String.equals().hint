@@ -39,8 +39,28 @@ $str1.equalsIgnoreCase($str2)
 ;;
 
 // null safe "foo".equals(foo)
-$str1 != null && $str1.equals($str2) :: $str1 instanceof String && $str2 instanceof String && isStringLiteral($str2) =>
+"call equals() on String literal and remove null check":
+$nullcheck && $str1.equals($str2) :: $str1 instanceof String && $str2 instanceof String
+                                  && isStringLiteral($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
 $str2.equals($str1)
+;;
+
+"call equals() on String literal and remove null check":
+$nullcheck && $str2.equals($str1) :: $str1 instanceof String && $str2 instanceof String
+                                  && isStringLiteral($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
+$str2.equals($str1)
+;;
+
+"call equalsIgnoreCase() on String literal and remove null check":
+$nullcheck && $str1.equalsIgnoreCase($str2) :: $str1 instanceof String && $str2 instanceof String
+                                            && isStringLiteral($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
+$str2.equalsIgnoreCase($str1)
+;;
+
+"call equalsIgnoreCase() on String literal and remove null check":
+$nullcheck && $str2.equalsIgnoreCase($str1) :: $str1 instanceof String && $str2 instanceof String
+                                            && isStringLiteral($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
+$str2.equalsIgnoreCase($str1)
 ;;
 
 <?
