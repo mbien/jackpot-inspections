@@ -240,17 +240,32 @@ $map.putIfAbsent($k, $v);
 // add to sub-collection
 "could be replaced with putIfAbsent(key, new SubCollection()).add(toAdd)":
 $Col $subcol = $map.get($key);
-if ($subcol == null) {
+if ($nullcheck) {
     $subcol = $subColInit;
     $map.put($key, $subcol);
 }
-$statement;                                     :: $map instanceof java.util.Map && $subcol instanceof java.util.Collection
+$statement;                                     :: $map instanceof java.util.Map && $subcol instanceof java.util.Collection && matchesAny($nullcheck, "$subcol == null", "null == $subcol")
 =>
 $map.putIfAbsent($key, $subColInit).add($item); :: matchesWithBind($statement, "$subcol.add($item);")
 =>
 $Col $subcol = $map.putIfAbsent($key, $subColInit);
 $statement;                                     :: otherwise
 ;;
+
+// variant 2
+"could be replaced with putIfAbsent(key, new SubCollection()).add(toAdd)":
+$Col $subcol = $map.get($key);
+if ($nullcheck) {
+    $map.put($key, $subcol = $subColInit);
+}
+$statement;                                     :: $map instanceof java.util.Map && $subcol instanceof java.util.Collection && matchesAny($nullcheck, "$subcol == null", "null == $subcol")
+=>
+$map.putIfAbsent($key, $subColInit).add($item); :: matchesWithBind($statement, "$subcol.add($item);")
+=>
+$Col $subcol = $map.putIfAbsent($key, $subColInit);
+$statement;                                     :: otherwise
+;;
+
 
 // get instead contains (dangerous! values can be null)
 /*
