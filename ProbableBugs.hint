@@ -1,5 +1,5 @@
 <?
-import java.lang.reflect.Method;
+import org.netbeans.modules.java.hints.declarative.APIAccessor;
 import javax.lang.model.element.ElementKind;
 import com.sun.source.tree.LiteralTree;
 import com.sun.source.tree.Tree.Kind;
@@ -27,6 +27,16 @@ $s.length() >= 0 :: $s instanceof String;;
 "This does not seem to be a regexp pattern, consider String.replace() instead.":
 $str.replaceAll($s0, $s1) :: $str instanceof String && $s0 instanceof String && $s1 instanceof String && !isRegexp($s0) =>
 $str.replace($s0, $s1)
+;;
+
+"swap variables: path.getExtension() can return null":
+$path.getExtension().equals($ext) :: $path instanceof java.nio.file.Path && $ext instanceof String && sourceVersionGE(20) =>
+$ext.equals($path.getExtension())
+;;
+
+"swap variables: path.getExtension() can return null":
+$path.getExtension().equalsIgnoreCase($ext) :: $path instanceof java.nio.file.Path && $ext instanceof String && sourceVersionGE(20) =>
+$ext.equalsIgnoreCase($path.getExtension())
 ;;
 
 // functional streams which use native resources
@@ -67,9 +77,7 @@ public boolean isRegexp(Variable str) throws Throwable {
 }
 
 private String getStringLiteral(Variable str) throws Throwable {
-    Method m = context.getClass().getDeclaredMethod("getSingleVariable", Variable.class);
-    m.setAccessible(true);
-    TreePath tp = (TreePath) m.invoke(context, str);
+    TreePath tp = APIAccessor.IMPL.getSingleVariable(context, str);
     if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
         return (String) ((LiteralTree) tp.getLeaf()).getValue();
     }
