@@ -91,8 +91,25 @@ java.util.Set.of($a$);;
 java.util.Collections.unmodifiableSet(new $Set<$T$>(java.util.List.of($a$))) :: $Set instanceof java.util.Set && sourceVersionGE(9) =>
 java.util.Set.of($a$);;
 
+"could be replaced with new LinkedHashSet<>().":
 java.util.Collections.newSetFromMap(new java.util.LinkedHashMap<$kv$>()) =>
 new java.util.LinkedHashSet<>();;
+
+"could be replaced with new LinkedHashSet<>().":
+java.util.Collections.newSetFromMap(new java.util.LinkedHashMap<$kv$>($c)) :: $c instanceof int =>
+new java.util.LinkedHashSet<>($c);;
+
+"could be replaced with new LinkedHashSet<>().":
+java.util.Collections.newSetFromMap(new java.util.LinkedHashMap<$kv$>($c, $f)) :: $c instanceof int && $f instanceof float =>
+new java.util.LinkedHashSet<>($c, $f);;
+
+"could be replaced with ConcurrentHashMap.newKeySet().":
+java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<$kv$>()) =>
+java.util.concurrent.ConcurrentHashMap.newKeySet();;
+
+"could be replaced with ConcurrentHashMap.newKeySet().":
+java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<$kv$>($c)) :: $c instanceof int =>
+java.util.concurrent.ConcurrentHashMap.newKeySet($c);;
 
 // todo: needs read only check
 "could be potentially replaced with Set.of(..) - if immutable.":
@@ -288,6 +305,7 @@ $col.forEach($o -> $map.put($key, $value));
 
 
 // removeIf() 8+
+"can use removeIf($condition)":
 java.util.Iterator<$T> $it = $col.iterator();
 while ($it.hasNext()) {
     $T $t = $it.next();
@@ -312,6 +330,7 @@ $col.removeIf($T::$foo)
 ;;
 */
 
+"can use removeIf($condition)":
 for (java.util.Iterator<$T> $it = $col.iterator(); $it.hasNext(); ) {
     $T $t = $it.next();
     if ($condition) {
