@@ -155,15 +155,38 @@ $col.addAll(java.util.Arrays.asList($array$));;
 
 
 // prefer copy constructor over addAll()
-$more$ $col = new $Col();
-$col.addAll($other); :: $Col instanceof java.util.Collection =>
-$more$ $col = new $Col($other);
+"can use copy constructor":
+$pre$ $col = new $Col();
+$col.addAll($other);
+$more$;
+:: $Col instanceof java.util.Collection && !containsAny($more$, "$col.addAll($other2)") =>
+$pre$ $col = new $Col($other);
+$more$;
 ;;
 
-$more$ $map = new $Map();
-$map.putAll($other); :: $Map instanceof java.util.Map =>
-$more$ $map = new $Map($other);
+"can use copy constructor":
+$pre$ $col = new $Col($other.size());
+$col.addAll($other);
+:: $Col instanceof java.util.Collection =>
+$pre$ $col = new $Col($other);
 ;;
+
+"can use copy constructor":
+$pre$ $map = new $Map();
+$map.putAll($other);
+$more$;
+:: $Map instanceof java.util.Map && !containsAny($more$, "$map.putAll($other2)") =>
+$pre$ $map = new $Map($other);
+$more$;
+;;
+
+"can use copy constructor":
+$pre$ $map = new $Map($other.size());
+$map.putAll($other);
+:: $Map instanceof java.util.Map =>
+$pre$ $map = new $Map($other);
+;;
+
 
 // avoid inefficient map traversal
 for ($K $k : $map.keySet()) {
