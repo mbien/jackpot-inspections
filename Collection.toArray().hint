@@ -15,6 +15,27 @@ ToArrayJMH.toZero      64  avgt    5    70.641 ± 0.662  ns/op
 ToArrayJMH.toZero    1024  avgt    5   860.637 ± 4.714  ns/op
 */
 
+"Array conversion can be optimized by allowing the JVM to create the array.":
+$T[] $array = new $T[$c.size()];
+$a$ $b$ = $c.toArray($array);
+$more$                           :: $c instanceof java.util.Collection && !referencedIn($array, $more$)
+=>
+$a$ $b$ = $c.toArray($T[]::new);
+$more$                           :: sourceVersionGE(11)
+=>
+$a$ $b$ = $c.toArray(new $T[0]);
+$more$                           :: otherwise
+;;
+
+"Array conversion can be optimized by allowing the JVM to create the array.":
+$T[] $array = new $T[$c.size()];
+return $c.toArray($array);    :: $c instanceof java.util.Collection
+=>
+return $c.toArray($T[]::new); :: sourceVersionGE(11)
+=>
+return $c.toArray(new $T[0]); :: otherwise
+;;
+
 // https://github.com/apache/netbeans/pull/3166 (12.6+)
 /*
 "Array conversion can be optimized by allowing the JVM to create the array.":
