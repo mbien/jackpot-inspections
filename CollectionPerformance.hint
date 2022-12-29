@@ -4,6 +4,7 @@ import com.sun.source.tree.*;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.util.TreePath;
 import com.sun.tools.javac.tree.*;
+import javax.lang.model.element.ElementKind;
 ?>
 
 <!description="Refactor to modern Collection APIs and idioms.">
@@ -269,43 +270,75 @@ if ($map.remove($k) == null) {
 ;;
 
 // contains + put
-"could be potentially replaced with putIfAbsent(key, value) if the map does not contain null values":
+"could be potentially replaced with [compute|put]IfAbsent(key, value) if the map does not contain null values":
 if (!$map.containsKey($k)) {
     $map.put($k, $v);
-} :: $map instanceof java.util.Map
+}                                    :: $map instanceof java.util.Map
 =>
-$map.putIfAbsent($k, $v);
+$map.putIfAbsent($k, $v);            :: elementKindMatches($v, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE, ElementKind.ENUM_CONSTANT)
+=>
+$map.computeIfAbsent($k, k -> $v);   :: otherwise
 ;;
 
-// add to sub-collection
-"could be replaced with putIfAbsent(key, new SubCollection()).add(toAdd)":
-$Col $subcol = $map.get($key);
+"could be replaced with [compute|put]IfAbsent(key, value)":
 if ($nullcheck) {
-    $subcol = $subColInit;
-    $map.put($key, $subcol);
-}
-$statement;                                     :: $map instanceof java.util.Map && $subcol instanceof java.util.Collection && matchesAny($nullcheck, "$subcol == null", "null == $subcol")
+    $map.put($k, $v);
+}                                    :: $map instanceof java.util.Map && matchesAny($nullcheck, "$map.get($k) == null", "null == $map.get($k)")
 =>
-$map.putIfAbsent($key, $subColInit).add($item); :: matchesWithBind($statement, "$subcol.add($item);")
+$map.putIfAbsent($k, $v);            :: elementKindMatches($v, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE, ElementKind.ENUM_CONSTANT)
 =>
-$Col $subcol = $map.putIfAbsent($key, $subColInit);
-$statement;                                     :: otherwise
+$map.computeIfAbsent($k, k -> $v);   :: otherwise
+;;
+
+// add to sub-collection or other values
+"could be replaced with [compute|put]IfAbsent($key, k -> $valInit)":
+$Val $val = $map.get($key);
+if ($nullcheck) {
+    $val = $valInit;
+    $map.put($key, $val);
+}                                                      :: $map instanceof java.util.Map && matchesAny($nullcheck, "$val == null", "null == $val")
+=>
+$Val $val = $map.putIfAbsent($key, $valInit);          :: elementKindMatches($valInit, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE, ElementKind.ENUM_CONSTANT)
+=>
+$Val $val = $map.computeIfAbsent($key, k -> $valInit); :: otherwise
 ;;
 
 // variant 2
-"could be replaced with putIfAbsent(key, new SubCollection()).add(toAdd)":
-$Col $subcol = $map.get($key);
+"could be replaced with [compute|put]IfAbsent($key, k -> $valInit)":
+$Val $val = $map.get($key);
 if ($nullcheck) {
-    $map.put($key, $subcol = $subColInit);
-}
-$statement;                                     :: $map instanceof java.util.Map && $subcol instanceof java.util.Collection && matchesAny($nullcheck, "$subcol == null", "null == $subcol")
+    $map.put($key, $val = $valInit);
+}                                    :: $map instanceof java.util.Map && matchesAny($nullcheck, "$val == null", "null == $val")
 =>
-$map.putIfAbsent($key, $subColInit).add($item); :: matchesWithBind($statement, "$subcol.add($item);")
+$Val $val = $map.putIfAbsent($key, $valInit);          :: elementKindMatches($valInit, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE, ElementKind.ENUM_CONSTANT)
 =>
-$Col $subcol = $map.putIfAbsent($key, $subColInit);
-$statement;                                     :: otherwise
+$Val $val = $map.computeIfAbsent($key, k -> $valInit); :: otherwise
 ;;
 
+"could be replaced with [compute|put]IfAbsent($key, k -> $valInit) to only compute when needed":
+$map.putIfAbsent($key, $value)       :: $map instanceof java.util.Map && !elementKindMatches($value, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE, ElementKind.ENUM_CONSTANT)
+=>
+$map.computeIfAbsent($key, k -> $value)
+;;
+
+// complementary inline rules
+"could be inlined as putIfAbsent(key, value).method(..)":
+$Val $val = $map.putIfAbsent($key, $value);
+$val.$method($params$);
+$more$                               :: $map instanceof java.util.Map && !referencedIn($val, $more$)
+=>
+$map.putIfAbsent($key, $value).$method($params$);
+$more$
+;;
+
+"could be inlined as computeIfAbsent(key, value).method(..)":
+$Val $val = $map.computeIfAbsent($key, $value);
+$val.$method($params$);
+$more$                               :: $map instanceof java.util.Map && !referencedIn($val, $more$)
+=>
+$map.computeIfAbsent($key, $value).$method($params$);
+$more$
+;;
 
 // get instead contains (dangerous! values can be null)
 /*
