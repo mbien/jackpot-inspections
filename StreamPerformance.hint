@@ -242,6 +242,40 @@ $col.stream().forEach($con) :: $col instanceof java.util.Collection && $con inst
 $col.forEach($con)
 ;;
 
+"remove redundant toList() before forEach().":
+$stream.toList().forEach($con) :: $stream instanceof java.util.stream.Stream && $con instanceof java.util.function.Consumer =>
+$stream.forEach($con)
+;;
+
+"could potentially use forEach() instead of intermediate Collection if all elements are traversed.":
+for ($E $elem : $stream.toList()) {
+    $body$;
+}
+:: $stream instanceof java.util.stream.Stream =>
+$stream.forEach($elem -> {
+    $body$;
+});
+;;
+
+"could potentially use forEach() instead of intermediate Collection if all elements are traversed.":
+java.util.List<$E> $list = $stream.toList();
+for ($E $elem : $list) {
+    $body$;
+}
+:: $stream instanceof java.util.stream.Stream =>
+$stream.forEach($elem -> {
+    $body$;
+});
+;;
+
+// doesn't work as fix. !containsAny("return;") doesn't work either
+/*
+=>
+for ($E $elem : (Iterable<$E>) $stream::iterator) {
+    $body$;
+}
+*/
+
 // use copy constructors
 // collection.stream().collect(toList/toSet) -> new CollectionType<>(collection)
 $col.stream().collect(java.util.stream.Collectors.toList()) :: $col instanceof java.util.Collection =>

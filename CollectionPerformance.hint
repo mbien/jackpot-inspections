@@ -373,18 +373,16 @@ while ($it.hasNext()) {
 $col.removeIf($t -> $condition);
 ;;
 
-// this one gonna be tricky
-/*
+"can use removeIf($condition)":
 java.util.Iterator<$T> $it = $col.iterator();
 while ($it.hasNext()) {
-    if ($it.next().$foo() {
+    if ($it.next().$condition($params$) {
         $it.remove();
     }
 } :: $col instanceof java.util.Collection
 =>
-$col.removeIf($T::$foo)
+$col.removeIf(e -> e.$condition($params$));
 ;;
-*/
 
 "can use removeIf($condition)":
 for (java.util.Iterator<$T> $it = $col.iterator(); $it.hasNext(); ) {
@@ -397,6 +395,53 @@ for (java.util.Iterator<$T> $it = $col.iterator(); $it.hasNext(); ) {
 $col.removeIf($t -> $condition);
 ;;
 
+
+"can use forEachRemaining($body)":
+while ($it.hasNext()) {
+    $T $entry = $it.next();
+    $body$;
+} :: $it instanceof java.util.Iterator && !referencedIn($it, $body$)
+=>
+$it.forEachRemaining($entry -> {
+    $body$;
+});
+;;
+
+"can use for-each loop":
+java.util.Iterator<$T> $it = $iterable.iterator();
+while ($it.hasNext()) {
+    $T $entry = $it.next();
+    $body$;
+} :: $it instanceof java.util.Iterator && $iterable instanceof java.lang.Iterable && !referencedIn($it, $body$)
+=>
+for ($T $entry : $iterable) {
+    $body$;
+}
+;;
+
+"inline iterator variable":
+java.util.Iterator<$T> $it = $IT;
+$it.forEachRemaining($body$);
+$rest$;                          :: !referencedIn($it, $rest$)
+=>
+$col.forEach($body$);
+$rest$;                          :: matchesWithBind($IT, "$col.iterator()") && $col instanceof java.util.Collection
+=>
+$IT.forEachRemaining($body$);
+$rest$;                          :: otherwise
+;;
+
+"can use for-each loop over Iterable":
+for (java.util.Iterator<$T> $it = $iterable.iterator(); $it.hasNext(); ) {
+    $T $v = $it.next();
+    $body$;
+}
+:: $iterable instanceof Iterable && !referencedIn($it, $body$)
+=>
+for ($T $v : $iterable) {
+    $body$;
+}
+;;
 
 // URLs as keys can caue performance problems
 // set + URL
