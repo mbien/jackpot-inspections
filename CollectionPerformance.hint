@@ -188,6 +188,55 @@ $map.putAll($other);
 $pre$ $map = new $Map($other);
 ;;
 
+"can use containsKey()":
+$map.keySet().contains($key) :: $map instanceof java.util.Map =>
+$map.containsKey($key)
+;;
+
+"can use containsValue()":
+$map.values().contains($value) :: $map instanceof java.util.Map =>
+$map.containsValue($value)
+;;
+
+"can use removeAll()":
+for ($E $e : $col) {
+    $other.remove($e);
+}
+:: $col instanceof java.util.Collection && $other instanceof java.util.Collection =>
+$other.removeAll($col);
+;;
+
+"can use keySet().removeAll()":
+for ($E $e : $col) {
+    $map.remove($e);
+}
+:: $col instanceof java.util.Collection && $map instanceof java.util.Map =>
+$map.keySet().removeAll($col);
+;;
+
+"can use addAll()":
+for ($E $e : $col) {
+    $other.add($e);
+}
+:: $col instanceof java.util.Collection && $other instanceof java.util.Collection =>
+$other.addAll($col);
+;;
+
+"can use putAll()":
+for ($K $k : $map.keySet()) {
+    $other.add($k, $map.get($k));
+}
+:: $map instanceof java.util.Map && $other instanceof java.util.Map =>
+$other.putAll($map);
+;;
+
+"can use putAll()":
+for ($E $e : $map.entrySet()) {
+    $other.add($e.getKey(), $e.getValue());
+}
+:: $map instanceof java.util.Map && $other instanceof java.util.Map && E instanceof java.util.Map.Entry =>
+$other.putAll($map);
+;;
 
 // avoid inefficient map traversal
 for ($K $k : $map.keySet()) {
