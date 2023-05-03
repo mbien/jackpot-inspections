@@ -164,6 +164,23 @@ java.util.Locale.of($args$)
 ;;
 
 
+// 20+
+"deprecated URL constructor could be potentially changed to the URI.toURL() replacement. Case-by-case revew required.":
+new java.net.URL($s) :: $s instanceof String && sourceVersionGE(20) =>
+new java.net.URI($s).toURL()
+;;
+
+"deprecated URL constructor could be potentially changed to the URI.toURL() replacement. Case-by-case revew required.":
+new java.net.URL($proto, $host, $file) :: $proto instanceof String && $host instanceof String && $file instanceof String && sourceVersionGE(20) =>
+new java.net.URI($proto, $host, $file, null).toURL()
+;;
+    
+"deprecated URL constructor could be potentially changed to the URI.toURL() replacement. Case-by-case revew required.":
+new java.net.URL($proto, $host, $port, $file) :: $proto instanceof String && $host instanceof String && $port instanceof int && $file instanceof String && sourceVersionGE(20) =>
+new java.net.URI($proto, null, $host, $port, $file, null, null).toURL()
+;;
+
+
 <?
 public boolean flag2Enum(Variable str, Variable target) throws Throwable {
     
