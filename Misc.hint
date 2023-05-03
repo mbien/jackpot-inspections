@@ -81,6 +81,10 @@ $val + "" =>
 String.valueOf($val)
 ;;
 
+$str.substring($begin, $end).indexOf($other) + $begin :: $str instanceof String && $begin instanceof int && $end instanceof int && sourceVersionGE(21) =>
+$str.indexOf($other, $begin, $end)
+;;
+
 /* TODO: doesn't work unless there is a way to create constants
 "extract Pattern constant.":
 $str.matches($regex) :: $str instanceof java.lang.String && $regex instanceof java.lang.String =>
