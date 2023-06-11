@@ -150,6 +150,41 @@ java.util.Map.copyOf($map);;
 java.util.Collections.sort($list, $comp) :: $list instanceof java.util.List =>
 $list.sort($comp);;
 
+// shorter and in super SequencedCollection/Map interface
+"can use reversed()":
+$set.descendingSet() :: $set instanceof java.util.NavigableSet && sourceVersionGE(21) =>
+$set.reversed();;
+
+"can use reversed()":
+$map.descendingMap() :: $map instanceof java.util.NavigableMap && sourceVersionGE(21) =>
+$map.reversed();;
+
+// more sequenced collection methods
+"can use getFirst()":
+$list.get(0) :: $list instanceof java.util.List && sourceVersionGE(21) =>
+$list.getFirst();;
+
+"can use removeFirst()":
+$list.remove(0) :: $list instanceof java.util.List && sourceVersionGE(21) =>
+$list.removeFirst();;
+
+"can use addFirst()":
+$list.add(0, $elem) :: $list instanceof java.util.List && sourceVersionGE(21) =>
+$list.addFirst($elem);;
+
+"can use getLast()":
+$list.get($list.size()-1) :: $list instanceof java.util.List && sourceVersionGE(21) =>
+$list.getLast();;
+
+"can use removeLast()":
+$list.remove($list.size()-1) :: $list instanceof java.util.List && sourceVersionGE(21) =>
+$list.removeLast();;
+
+"can use addLast()":
+$list.add($list.size()-1, $elem) :: $list instanceof java.util.List && sourceVersionGE(21) =>
+$list.addLast($elem);;
+
+
 // collections have faster bulk add opperations than the sequential loop of Collections.addAll()
 java.util.Collections.addAll($col, $array$) :: $col instanceof java.util.Collection =>
 $col.addAll(java.util.Arrays.asList($array$));;
