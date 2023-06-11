@@ -12,6 +12,15 @@ new java.io.File($s, $c).toPath()   :: $s instanceof String && $c instanceof Str
 =>  java.nio.file.Paths.get($s, $c) :: otherwise
 ;;
 
+"change to java.nio.file.Files for improved security.":
+java.io.File.createTempFile($prefix, $suffix) :: $prefix instanceof String && $suffix instanceof String =>
+java.nio.file.Files.createTempFile($prefix, $suffix).toFile()
+;;
+
+"change to java.nio.file.Files for improved security.":
+java.io.File.createTempFile($prefix, $suffix, $dir) :: $prefix instanceof String && $suffix instanceof String && $dir instanceof java.io.File =>
+java.nio.file.Files.createTempFile($dir.toPath(), $prefix, $suffix).toFile()
+;;
 
 // one variant is 10+
 "Rewrite to ByteArrayOutputStream.toByteArray().":
