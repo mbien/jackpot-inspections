@@ -4,74 +4,157 @@ import org.netbeans.modules.java.hints.declarative.APIAccessor;
 import javax.lang.model.element.ElementKind;
 import com.sun.source.util.TreePath;
 import com.sun.source.tree.Tree.Kind;
+import com.sun.source.tree.LiteralTree;
 ?>
 
 <!description="Use String#equals() where applicable.">
 
 // compareTo could be equals
+"could use equals()":
 $str1.compareTo($str2) == 0 :: $str1 instanceof String && $str2 instanceof String =>
 $str1.equals($str2)
 ;;
 
+"could use equals()":
 $str1.compareTo($str2) != 0 :: $str1 instanceof String && $str2 instanceof String =>
 !$str1.equals($str2)
 ;;
 
 // could use equalsIgnoreCase
+"could use equalsIgnoreCase()":
 $str1.toLowerCase().equals($str2.toLowerCase()) :: $str1 instanceof String && $str2 instanceof String =>
 $str1.equalsIgnoreCase($str2)
 ;;
+"could use equalsIgnoreCase()":
 $str1.toLowerCase().equals($str2) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str2, "$str.toLowerCase()") =>
 $str1.equalsIgnoreCase($str2)
 ;;
+"could use equalsIgnoreCase()":
 $str1.equals($str2.toLowerCase()) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str1, "$str.toLowerCase()") =>
 $str1.equalsIgnoreCase($str2)
 ;;
 
+"could use equalsIgnoreCase()":
 $str1.toUpperCase().equals($str2.toUpperCase()) :: $str1 instanceof String && $str2 instanceof String =>
 $str1.equalsIgnoreCase($str2)
 ;;
+"could use equalsIgnoreCase()":
 $str1.toUpperCase().equals($str2) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str2, "$str.toUpperCase()") =>
 $str1.equalsIgnoreCase($str2)
 ;;
+"could use equalsIgnoreCase()":
 $str1.equals($str2.toUpperCase()) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str1, "$str.toUpperCase()") =>
 $str1.equalsIgnoreCase($str2)
+;;
+
+// https://medium.com/javarevisited/micro-optimizations-in-java-string-equalsignorecase-ea25dfb03f95
+"could use regionMatches()":
+$str1.toLowerCase().startsWith($str2) :: $str1 instanceof String && $str2 instanceof String && noSideEffects($str2) =>
+$str1.regionMatches(true/*check*/, 0, $str2, 0, $str2.length())
+;;
+
+"could use regionMatches()":
+$str1.toUpperCase().startsWith($str2) :: $str1 instanceof String && $str2 instanceof String && noSideEffects($str2) =>
+$str1.regionMatches(true/*check*/, 0, $str2, 0, $str2.length())
+;;
+
+"could use regionMatches()":
+$str1.substring($start).equals($str2) :: $str1 instanceof String && $str2 instanceof String && $start instanceof int && noSideEffects($str2) =>
+$str1.regionMatches($start, $str2, 0, $str2.length())
+;;
+
+"could use regionMatches()":
+$str1.substring($start).equalsIgnoreCase($str2) :: $str1 instanceof String && $str2 instanceof String && $start instanceof int && noSideEffects($str2) =>
+$str1.regionMatches(true, $start, $str2, 0, $str2.length())
+;;
+
+"could use regionMatches()":
+$str1.substring($start, $end).equals($str2) :: $str1 instanceof String && $str2 instanceof String && $start instanceof int && $end instanceof int =>
+$str1.regionMatches($start, $str2, 0, $str2.length()) :: noSideEffects($str2) =>
+$str1.regionMatches($start, $str2, 0, $end-$start)    :: otherwise
+;;
+
+"could use regionMatches()":
+$str1.substring($start, $end).equalsIgnoreCase($str2) :: $str1 instanceof String && $str2 instanceof String && $start instanceof int && $end instanceof int =>
+$str1.regionMatches(true, $start, $str2, 0, $str2.length()) :: noSideEffects($str2) =>
+$str1.regionMatches(true, $start, $str2, 0, $end-$start)    :: otherwise
+;;
+
+"could use regionMatches()":
+$str1.equals($str2.substring($start, $end)) :: $str1 instanceof String && $str2 instanceof String && $start instanceof int && $end instanceof int && noSideEffects($str2) =>
+$str1.regionMatches(0, $str2, $start, $end-$start)
+;;
+
+"could use regionMatches()":
+$str1.equalsIgnoreCase($str2.substring($start, $end)) :: $str1 instanceof String && $str2 instanceof String && $start instanceof int && $end instanceof int && noSideEffects($str2) =>
+$str1.regionMatches(true, 0, $str2, $start, $end-$start)
 ;;
 
 // null safe "foo".equals(foo)
 "call equals() on String literal and remove null check":
 $nullcheck && $str1.equals($str2) :: $str1 instanceof String && $str2 instanceof String
-                                  && isStringLiteral($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
+                                  && noSideEffects($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
 $str2.equals($str1)
 ;;
 
 "call equals() on String literal and remove null check":
 $nullcheck && $str2.equals($str1) :: $str1 instanceof String && $str2 instanceof String
-                                  && isStringLiteral($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
+                                  && noSideEffects($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
 $str2.equals($str1)
 ;;
 
 "call equalsIgnoreCase() on String literal and remove null check":
 $nullcheck && $str1.equalsIgnoreCase($str2) :: $str1 instanceof String && $str2 instanceof String
-                                            && isStringLiteral($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
+                                            && noSideEffects($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
 $str2.equalsIgnoreCase($str1)
 ;;
 
 "call equalsIgnoreCase() on String literal and remove null check":
 $nullcheck && $str2.equalsIgnoreCase($str1) :: $str1 instanceof String && $str2 instanceof String
-                                            && isStringLiteral($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
+                                            && noSideEffects($str2) && matchesAny($nullcheck, "$str1 != null", "null != $str1") =>
 $str2.equalsIgnoreCase($str1)
 ;;
 
+// https://medium.com/javarevisited/micro-optimizations-in-java-string-equals-22be19fd8416
+"change to more verbose but optimized char comparison.":
+$single.equals($str)                                        :: $str instanceof String && $single instanceof String && isSingleCharacter($single) =>
+$str != null && $str.length() == 1 && $str.charAt(0) == $c  :: string2Char($single, $c)
+;;
+
+"change to more verbose but optimized char comparison.":
+$str.equals($single)                                        :: $str instanceof String && $single instanceof String && isSingleCharacter($single) =>
+$str.length() == 1 && $str.charAt(0) == $c                  :: string2Char($single, $c)
+;;
+
+
 <?
-private boolean isStringLiteral(Variable str) throws Throwable {
-    if (ElementKind.FIELD.equals(context.elementKind(str))) { // todo
-        return true;
-    }
+public boolean noSideEffects(Variable str) throws Exception {
+    ElementKind kind = context.elementKind(str);
+    return ElementKind.FIELD.equals(kind)
+        || ElementKind.LOCAL_VARIABLE.equals(kind)
+        || isStringLiteral(str);
+}
+
+public boolean string2Char(Variable str, Variable target) throws Exception {
+    String value = getStringLiteral(str);
+    context.createRenamed(str, target, "'"+ value +"'");
+    return true;
+}
+
+public boolean isSingleCharacter(Variable str) throws Exception {
+    String value = getStringLiteral(str);
+    return value != null && value.length() == 1;
+}
+
+public boolean isStringLiteral(Variable str) throws Exception {
+    return getStringLiteral(str) != null;
+}
+
+private String getStringLiteral(Variable str) throws Exception {
     TreePath tp = APIAccessor.IMPL.getSingleVariable(context, str);
     if (tp != null && tp.getLeaf().getKind() == Kind.STRING_LITERAL) {
-        return true;
+        return (String) ((LiteralTree) tp.getLeaf()).getValue();
     }
-    return false;
+    return null;
 }
 ?>

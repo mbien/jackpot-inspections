@@ -42,3 +42,9 @@ $str.length() != 0 :: $str instanceof String =>
 $str.length() > 0 :: $str instanceof String =>
 !$str.isEmpty()
 ;;
+
+// https://medium.com/javarevisited/micro-optimizations-in-java-string-equals-22be19fd8416
+"null check + isEmpty() is more verbose but also more efficient.":
+"".equals($str) :: $str instanceof String =>
+$str != null && $str.isEmpty()
+;;
