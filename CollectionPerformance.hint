@@ -392,11 +392,25 @@ $Val $val = $map.computeIfAbsent($key, k -> $valInit); :: otherwise
 $Val $val = $map.get($key);
 if ($nullcheck) {
     $map.put($key, $val = $valInit);
-}                                    :: $map instanceof java.util.Map && matchesAny($nullcheck, "$val == null", "null == $val")
+}                                                      :: $map instanceof java.util.Map && matchesAny($nullcheck, "$val == null", "null == $val")
 =>
 $Val $val = $map.putIfAbsent($key, $valInit);          :: elementKindMatches($valInit, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE, ElementKind.ENUM_CONSTANT)
 =>
 $Val $val = $map.computeIfAbsent($key, k -> $valInit); :: otherwise
+;;
+
+// variant with return
+"could be replaced with computeIfAbsent($key, k -> {$valInit})":
+$val = $map.get($key);
+if ($nullcheck) {
+    return $val;
+}
+$init$;
+$val = $valInit;
+$map.put($key, $val);                                  :: $map instanceof java.util.Map && matchesAny($nullcheck, "$val != null", "null != $val")
+                                                       && !referencedIn($map, $init$)
+=>
+$val = $map.computeIfAbsent($key, k -> {$init$; return $valInit;});
 ;;
 
 "could be replaced with [compute|put]IfAbsent($key, k -> $valInit) to only compute when needed":
