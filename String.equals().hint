@@ -20,6 +20,33 @@ $str1.compareTo($str2) != 0 :: $str1 instanceof String && $str2 instanceof Strin
 !$str1.equals($str2)
 ;;
 
+// could use compareToIgnoreCase
+"could use compareToIgnoreCase()":
+$str1.toLowerCase().compareTo($str2.toLowerCase()) :: $str1 instanceof String && $str2 instanceof String =>
+$str1.compareToIgnoreCase($str2)
+;;
+"could use compareToIgnoreCase()":
+$str1.toLowerCase().equals($str2) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str2, "$str.toLowerCase()") =>
+$str1.compareToIgnoreCase($str2)
+;;
+"could use compareToIgnoreCase()":
+$str1.equals($str2.toLowerCase()) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str1, "$str.toLowerCase()") =>
+$str1.compareToIgnoreCase($str2)
+;;
+
+"could use compareToIgnoreCase()":
+$str1.toUpperCase().compareTo($str2.toUpperCase()) :: $str1 instanceof String && $str2 instanceof String =>
+$str1.compareToIgnoreCase($str2)
+;;
+"could use compareToIgnoreCase()":
+$str1.toUpperCase().equals($str2) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str2, "$str.toUpperCase()") =>
+$str1.compareToIgnoreCase($str2)
+;;
+"could use compareToIgnoreCase()":
+$str1.equals($str2.toUpperCase()) :: $str1 instanceof String && $str2 instanceof String && !matchesAny($str1, "$str.toUpperCase()") =>
+$str1.compareToIgnoreCase($str2)
+;;
+
 // could use equalsIgnoreCase
 "could use equalsIgnoreCase()":
 $str1.toLowerCase().equals($str2.toLowerCase()) :: $str1 instanceof String && $str2 instanceof String =>
