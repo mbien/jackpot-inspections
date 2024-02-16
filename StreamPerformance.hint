@@ -247,6 +247,11 @@ $stream.toList().forEach($con) :: $stream instanceof java.util.stream.Stream && 
 $stream.forEach($con)
 ;;
 
+"can be simplified to iterable.forEach(..)":
+$iterable.iterator().forEachRemaining($con); :: $iterable instanceof java.lang.Iterable && $con instanceof java.util.function.Consumer =>
+$iterable.forEach($con);
+;;
+
 "could potentially use forEach() instead of intermediate Collection if all elements are traversed.":
 for ($E $elem : $stream.toList()) {
     $body$;
