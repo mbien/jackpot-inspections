@@ -89,3 +89,27 @@ Long.signum($a) :: $a instanceof Long
 =>
 Math.signum($a) :: otherwise
 ;;
+
+"could use compare(x, y)":
+Byte.valueOf($x).compareTo(Byte.valueOf($y)) :: $x instanceof byte && $y instanceof byte =>
+Byte.compare($x, $y);;
+
+"could use compare(x, y)":
+Short.valueOf($x).compareTo(Short.valueOf($y)) :: $x instanceof short && $y instanceof short =>
+Short.compare($x, $y);;
+
+"could use compare(x, y)":
+Integer.valueOf($x).compareTo(Integer.valueOf($y)) :: $x instanceof int && $y instanceof int =>
+Integer.compare($x, $y);;
+
+"could use compare(x, y)":
+Long.valueOf($x).compareTo(Long.valueOf($y)) :: $x instanceof long && $y instanceof long =>
+Long.compare($x, $y);;
+
+"could use compare(x, y)":
+Float.valueOf($x).compareTo(Float.valueOf($y)) :: $x instanceof float && $y instanceof float =>
+Float.compare($x, $y);;
+
+"could use compare(x, y)":
+Double.valueOf($x).compareTo(Double.valueOf($y)) :: $x instanceof double && $y instanceof double =>
+Double.compare($x, $y);;
