@@ -144,14 +144,14 @@ StandardCharsets.UTF_8.newDecoder()
         }
     }
     private boolean isCharsetString(Variable str) throws Throwable {
-        return standardCharsetNames.contains(getStringLiteral(str));
+        return standardCharsetNames.contains(getStringLiteral(str).toUpperCase());
     }
     public boolean string2Charset(Variable str, Variable charset) throws Throwable {
         String string = getStringLiteral(str);
         if (string == null) {
             return false;
         }
-        context.createRenamed(str, charset, "StandardCharsets."+string.replace('-', '_'));
+        context.createRenamed(str, charset, "StandardCharsets."+string.replace('-', '_').toUpperCase());
         return true;
     }
     private String getStringLiteral(Variable str) throws Throwable {
