@@ -181,6 +181,28 @@ new java.net.URI($proto, null, $host, $port, $file, null, null).toURL()
 ;;
 
 
+// since 23 but always applicable
+"use long returning variant":
+$def.getTotalIn() :: $def instanceof java.util.zip.Deflater =>
+$def.getBytesRead()
+;;
+
+"use long returning variant":
+$def.getTotalOut():: $def instanceof java.util.zip.Deflater =>
+$def.getBytesWritten()
+;;
+
+"use long returning variant":
+$inf.getTotalIn() :: $inf instanceof java.util.zip.Inflater =>
+$inf.getBytesRead()
+;;
+
+"use long returning variant":
+$inf.getTotalOut():: $inf instanceof java.util.zip.Inflater =>
+$inf.getBytesWritten()
+;;
+
+
 <?
 public boolean flag2Enum(Variable str, Variable target) throws Throwable {
     
