@@ -189,6 +189,7 @@ $list.addLast($elem);;
 java.util.Collections.addAll($col, $array$) :: $col instanceof java.util.Collection =>
 $col.addAll(java.util.Arrays.asList($array$));;
 
+// todo $col = new $Col(); doesn't work
 
 // prefer copy constructor over addAll()
 "can use copy constructor":
@@ -253,7 +254,7 @@ $map.keySet().removeAll($col);
 for ($E $e : $col) {
     $other.add($e);
 }
-:: $col instanceof java.util.Collection && $other instanceof java.util.Collection =>
+:: $col instanceof java.util.Collection && $other instanceof java.util.Collection && elementKindMatches($other, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE) =>
 $other.addAll($col);
 ;;
 
@@ -261,7 +262,7 @@ $other.addAll($col);
 for ($K $k : $map.keySet()) {
     $other.add($k, $map.get($k));
 }
-:: $map instanceof java.util.Map && $other instanceof java.util.Map =>
+:: $map instanceof java.util.Map && $other instanceof java.util.Map && elementKindMatches($other, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE) =>
 $other.putAll($map);
 ;;
 
@@ -269,7 +270,7 @@ $other.putAll($map);
 for ($E $e : $map.entrySet()) {
     $other.add($e.getKey(), $e.getValue());
 }
-:: $map instanceof java.util.Map && $other instanceof java.util.Map && E instanceof java.util.Map.Entry =>
+:: $map instanceof java.util.Map && $other instanceof java.util.Map && E instanceof java.util.Map.Entry && elementKindMatches($other, ElementKind.FIELD, ElementKind.PARAMETER, ElementKind.LOCAL_VARIABLE) =>
 $other.putAll($map);
 ;;
 
@@ -459,36 +460,37 @@ $col.forEach($o -> $map.put($key, $value));
 
 
 // removeIf() 8+
+// for .iterator() and .listIterator()
 "can use removeIf($condition)":
-java.util.Iterator<$T> $it = $col.iterator();
+$Iter<$T> $it = $col.$iterator();
 while ($it.hasNext()) {
     $T $t = $it.next();
     if ($condition) {
         $it.remove();
     }
-} :: $col instanceof java.util.Collection
+} :: $col instanceof java.util.Collection && $Iter instanceof java.util.Iterator
 =>
 $col.removeIf($t -> $condition);
 ;;
 
 "can use removeIf($condition)":
-java.util.Iterator<$T> $it = $col.iterator();
+$Iter<$T> $it = $col.$iterator();
 while ($it.hasNext()) {
-    if ($it.next().$condition($params$) {
+    if ($it.next().$condition($params$)) {
         $it.remove();
     }
-} :: $col instanceof java.util.Collection
+} :: $col instanceof java.util.Collection && $Iter instanceof java.util.Iterator
 =>
 $col.removeIf(e -> e.$condition($params$));
 ;;
 
 "can use removeIf($condition)":
-for (java.util.Iterator<$T> $it = $col.iterator(); $it.hasNext(); ) {
+for ($Iter<$T> $it = $col.$iterator(); $it.hasNext();) {
     $T $t = $it.next();
     if ($condition) {
         $it.remove();
     }
-} :: $col instanceof java.util.Collection
+} :: $col instanceof java.util.Collection && $Iter instanceof java.util.Iterator
 =>
 $col.removeIf($t -> $condition);
 ;;
@@ -506,11 +508,11 @@ $it.forEachRemaining($entry -> {
 ;;
 
 "can use for-each loop":
-java.util.Iterator<$T> $it = $iterable.iterator();
+$Iter<$T> $it = $iterable.$iterator();
 while ($it.hasNext()) {
     $T $entry = $it.next();
     $body$;
-} :: $it instanceof java.util.Iterator && $iterable instanceof java.lang.Iterable && !referencedIn($it, $body$)
+} :: $it instanceof java.util.Iterator && $Iter instanceof java.util.Iterator && $iterable instanceof java.lang.Iterable && !referencedIn($it, $body$)
 =>
 for ($T $entry : $iterable) {
     $body$;
