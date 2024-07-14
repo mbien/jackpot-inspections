@@ -1,9 +1,8 @@
 
-<!description="Use String#isBlank() where applicable.">
-
-// todo: add strip() rules
+<!description="Use String#isBlank(), isEmpty() and other related rules.">
 
 // String.isBlank() 11+
+// trim() variants
 $str.trim().isEmpty() :: $str instanceof String && sourceVersionGE(11) =>
 $str.isBlank()
 ;;
@@ -26,6 +25,48 @@ $str.trim().length() != 0 :: $str instanceof String && sourceVersionGE(11) =>
 
 $str.trim().length() > 0 :: $str instanceof String && sourceVersionGE(11) =>
 !$str.isBlank()
+;;
+
+// strip() variants
+$str.strip().isEmpty() :: $str instanceof String && sourceVersionGE(11) =>
+$str.isBlank()
+;;
+
+$str.strip().equals("") :: $str instanceof String && sourceVersionGE(11) =>
+$str.isBlank()
+;;
+
+"".equals($str.strip()) :: $str instanceof String && sourceVersionGE(11) =>
+$str.isBlank()
+;;
+
+$str.strip().length() == 0 :: $str instanceof String && sourceVersionGE(11) =>
+$str.isBlank()
+;;
+
+$str.strip().length() != 0 :: $str instanceof String && sourceVersionGE(11) =>
+!$str.isBlank()
+;;
+
+$str.strip().length() > 0 :: $str instanceof String && sourceVersionGE(11) =>
+!$str.isBlank()
+;;
+
+// partial trim()/strip()
+$str.trim().endsWith($other) :: $str instanceof String && $other instanceof String && sourceVersionGE(11) =>
+$str.stripTrailing().endsWith($other)
+;;
+
+$str.trim().startsWith($other) :: $str instanceof String && $other instanceof String && sourceVersionGE(11) =>
+$str.stripLeading().startsWith($other)
+;;
+
+$str.strip().endsWith($other) :: $str instanceof String && $other instanceof String && sourceVersionGE(11) =>
+$str.stripTrailing().endsWith($other)
+;;
+
+$str.strip().startsWith($other) :: $str instanceof String && $other instanceof String && sourceVersionGE(11) =>
+$str.stripLeading().startsWith($other)
 ;;
 
 // str.equals("") -> isEmpty() is already in NetBeans
