@@ -212,7 +212,7 @@ $pre$ $col = new $Col($other);
 $pre$ $map = new $Map();
 $map.putAll($other);
 $more$;
-:: $Map instanceof java.util.Map && !containsAny($more$, "$map.putAll($other2)") =>
+:: $Map instanceof java.util.Map && !$Map instanceof java.util.Properties  && !containsAny($more$, "$map.putAll($other2)") =>
 $pre$ $map = new $Map($other);
 $more$;
 ;;
@@ -220,7 +220,7 @@ $more$;
 "can use copy constructor":
 $pre$ $map = new $Map($other.size());
 $map.putAll($other);
-:: $Map instanceof java.util.Map =>
+:: $Map instanceof java.util.Map && !$Map instanceof java.util.Properties =>
 $pre$ $map = new $Map($other);
 ;;
 
