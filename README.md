@@ -2,7 +2,7 @@
 
 usage:
 
-* copy to ~/.netbeans/[version]/conf/rules
+* copy or clone into ~/.netbeans/[version]/config/rules/
   * restart NetBeans
   * enable in tools -> options -> editor -> hints for all projects
   * or in project -> properties -> hints on a per-project basis
