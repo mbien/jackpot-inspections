@@ -144,7 +144,11 @@ StandardCharsets.UTF_8.newDecoder()
         }
     }
     private boolean isCharsetString(Variable str) throws Throwable {
-        return standardCharsetNames.contains(getStringLiteral(str).toUpperCase());
+        String string = getStringLiteral(str);
+        if (string == null) {
+            return false;
+        }
+        return standardCharsetNames.contains(string.toUpperCase());
     }
     public boolean string2Charset(Variable str, Variable charset) throws Throwable {
         String string = getStringLiteral(str);
