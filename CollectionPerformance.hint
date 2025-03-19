@@ -234,6 +234,16 @@ $map.values().contains($value) :: $map instanceof java.util.Map =>
 $map.containsValue($value)
 ;;
 
+"can use map.size()":
+$map.keySet().size() :: $map instanceof java.util.Map =>
+$map.size()
+;;
+
+"can use map.size()":
+$map.values().size() :: $map instanceof java.util.Map =>
+$map.size()
+;;
+
 "can use removeAll()":
 for ($E $e : $col) {
     $other.remove($e);
