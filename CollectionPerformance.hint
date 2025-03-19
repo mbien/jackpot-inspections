@@ -424,19 +424,19 @@ $map.computeIfAbsent($key, k -> $value)
 "could be inlined as putIfAbsent(key, value).method(..)":
 $Val $val = $map.putIfAbsent($key, $value);
 $val.$method($params$);
-$more$                               :: $map instanceof java.util.Map && !referencedIn($val, $more$)
+$more$;                              :: $map instanceof java.util.Map && !referencedIn($val, $more$)
 =>
 $map.putIfAbsent($key, $value).$method($params$);
-$more$
+$more$;
 ;;
 
 "could be inlined as computeIfAbsent(key, value).method(..)":
 $Val $val = $map.computeIfAbsent($key, $value);
 $val.$method($params$);
-$more$                               :: $map instanceof java.util.Map && !referencedIn($val, $more$)
+$more$;                              :: $map instanceof java.util.Map && !referencedIn($val, $more$)
 =>
 $map.computeIfAbsent($key, $value).$method($params$);
-$more$
+$more$;
 ;;
 
 // get instead contains (dangerous! values can be null)
@@ -543,7 +543,7 @@ for ($T $v : $iterable) {
 }
 ;;
 
-// URLs as keys can caue performance problems
+// URLs as keys can cause performance problems
 // set + URL
 "URLs used as keys in collections can cause performance problems, since equals() and hashCode() trigger blocking domain lookup operations. Try using java.net.URI instead.":
 new $SET<java.net.URL>($args$) :: $SET instanceof java.util.Set =>
