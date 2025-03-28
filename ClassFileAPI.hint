@@ -1,0 +1,64 @@
+<?
+import java.lang.constant.ClassDesc;
+import java.lang.constant.ConstantDescs;
+?>
+
+<!description="Class-File API code improvements.">
+
+ClassDesc.of("java.lang.Object") => ConstantDescs.CD_Object;;
+ClassDesc.of("java.lang.String") => ConstantDescs.CD_String;;
+ClassDesc.of("java.lang.Class") => ConstantDescs.CD_Class;;
+ClassDesc.of("java.lang.Number") => ConstantDescs.CD_Number;;
+ClassDesc.of("java.lang.Integer") => ConstantDescs.CD_Integer;;
+ClassDesc.of("java.lang.Long") => ConstantDescs.CD_Long;;
+ClassDesc.of("java.lang.Float") => ConstantDescs.CD_Float;;
+ClassDesc.of("java.lang.Double") => ConstantDescs.CD_Double;;
+ClassDesc.of("java.lang.Short") => ConstantDescs.CD_Short;;
+ClassDesc.of("java.lang.Byte") => ConstantDescs.CD_Byte;;
+ClassDesc.of("java.lang.Character") => ConstantDescs.CD_Character;;
+ClassDesc.of("java.lang.Boolean") => ConstantDescs.CD_Boolean;;
+ClassDesc.of("java.lang.Void") => ConstantDescs.CD_Void;;
+ClassDesc.of("java.lang.Throwable") => ConstantDescs.CD_Throwable;;
+ClassDesc.of("java.lang.Exception") => ConstantDescs.CD_Exception;;
+ClassDesc.of("java.lang.Enum") => ConstantDescs.CD_Enum;;
+ClassDesc.of("java.lang.invoke.VarHandle") => ConstantDescs.CD_VarHandle;;
+ClassDesc.of("java.lang.invoke.MethodHandles") => ConstantDescs.CD_MethodHandles;;
+ClassDesc.of("java.lang.invoke.MethodHandles$Lookup") => ConstantDescs.CD_MethodHandles_Lookup;;
+ClassDesc.of("java.lang.invoke.MethodHandle") => ConstantDescs.CD_MethodHandle;;
+ClassDesc.of("java.lang.invoke.MethodType") => ConstantDescs.CD_MethodType;;
+ClassDesc.of("java.lang.invoke.CallSite") => ConstantDescs.CD_CallSite;;
+ClassDesc.of("java.util.Collection") => ConstantDescs.CD_Collection;;
+ClassDesc.of("java.util.List") => ConstantDescs.CD_List;;
+ClassDesc.of("java.util.Set") => ConstantDescs.CD_Set;;
+ClassDesc.of("java.util.Map") => ConstantDescs.CD_Map;;
+ClassDesc.of("java.lang.constant.ConstantDesc") => ConstantDescs.CD_ConstantDesc;;
+ClassDesc.of("java.lang.constant.ClassDesc") => ConstantDescs.CD_ClassDesc;;
+ClassDesc.of("java.lang.Enum$EnumDesc") => ConstantDescs.CD_EnumDesc;;
+ClassDesc.of("java.lang.constant.MethodTypeDesc") => ConstantDescs.CD_MethodTypeDesc;;
+ClassDesc.of("java.lang.constant.MethodHandleDesc") => ConstantDescs.CD_MethodHandleDesc;;
+ClassDesc.of("java.lang.constant.DirectMethodHandleDesc") => ConstantDescs.CD_DirectMethodHandleDesc;;
+ClassDesc.of("java.lang.invoke.VarHandle$VarHandleDesc") => ConstantDescs.CD_VarHandleDesc;;
+ClassDesc.of("java.lang.constant.DirectMethodHandleDesc$Kind") => ConstantDescs.CD_MethodHandleDesc_Kind;;
+ClassDesc.of("java.lang.constant.DynamicConstantDesc") => ConstantDescs.CD_DynamicConstantDesc;;
+ClassDesc.of("java.lang.constant.DynamicCallSiteDesc") => ConstantDescs.CD_DynamicCallSiteDesc;;
+ClassDesc.of("java.lang.invoke.ConstantBootstraps") => ConstantDescs.CD_ConstantBootstraps;;
+
+ClassDesc.ofDescriptor("I") => ConstantDescs.CD_int;;
+ClassDesc.ofDescriptor("J") => ConstantDescs.CD_long;;
+ClassDesc.ofDescriptor("F") => ConstantDescs.CD_float;;
+ClassDesc.ofDescriptor("D") => ConstantDescs.CD_double;;
+ClassDesc.ofDescriptor("S") => ConstantDescs.CD_short;;
+ClassDesc.ofDescriptor("B") => ConstantDescs.CD_byte;;
+ClassDesc.ofDescriptor("C") => ConstantDescs.CD_char;;
+ClassDesc.ofDescriptor("Z") => ConstantDescs.CD_boolean;;
+ClassDesc.ofDescriptor("V") => ConstantDescs.CD_void;;
+
+ClassDesc.ofDescriptor("[I") => ConstantDescs.CD_int.arrayType();;
+ClassDesc.ofDescriptor("[J") => ConstantDescs.CD_long.arrayType();;
+ClassDesc.ofDescriptor("[F") => ConstantDescs.CD_float.arrayType();;
+ClassDesc.ofDescriptor("[D") => ConstantDescs.CD_double.arrayType();;
+ClassDesc.ofDescriptor("[S") => ConstantDescs.CD_short.arrayType();;
+ClassDesc.ofDescriptor("[B") => ConstantDescs.CD_byte.arrayType();;
+ClassDesc.ofDescriptor("[C") => ConstantDescs.CD_char.arrayType();;
+ClassDesc.ofDescriptor("[Z") => ConstantDescs.CD_boolean.arrayType();;
+ClassDesc.ofDescriptor("[V") => ConstantDescs.CD_void.arrayType();;
