@@ -150,6 +150,10 @@ java.util.Map.copyOf($map);;
 java.util.Collections.sort($list, $comp) :: $list instanceof java.util.List =>
 $list.sort($comp);;
 
+"could use reversed view":
+java.util.Collections.reverse($list) :: $list instanceof java.util.List && sourceVersionGE(21) =>
+$list = $list.reversed();;
+
 // shorter and in super SequencedCollection/Map interface
 "can use reversed()":
 $set.descendingSet() :: $set instanceof java.util.NavigableSet && sourceVersionGE(21) =>
