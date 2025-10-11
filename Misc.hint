@@ -85,6 +85,16 @@ $str.substring($begin, $end).indexOf($other) + $begin :: $str instanceof String 
 $str.indexOf($other, $begin, $end)
 ;;
 
+"can use formatted":
+String.format($str, $args$) :: $str instanceof String && sourceVersionGE(15) =>
+$str.formatted($args$)
+;;
+
+"can remove redundant toString()":
+$sb1.append($sb2.toString()) :: $sb1 instanceof StringBuilder && $sb2 instanceof StringBuilder =>
+$sb1.append($sb2)
+;;
+
 /* TODO: doesn't work unless there is a way to create constants
 "extract Pattern constant.":
 $str.matches($regex) :: $str instanceof java.lang.String && $regex instanceof java.lang.String =>
